@@ -13,7 +13,11 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class CreateFollowupsPopups extends StatefulWidget {
   final Function onFormSubmit;
-  const CreateFollowupsPopups({super.key, required this.onFormSubmit});
+  final Function(int)? onTabChange;
+
+  const CreateFollowupsPopups({super.key, required this.onFormSubmit ,
+    this.onTabChange,
+  });
 
   @override
   State<CreateFollowupsPopups> createState() => _CreateFollowupsPopupsState();
@@ -287,6 +291,8 @@ class _CreateFollowupsPopupsState extends State<CreateFollowupsPopups> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Follow-up submitted successfully!')),
       );
+       widget.onFormSubmit?.call(); // Refresh dashboard data
+      widget.onTabChange?.call(0); 
     } else {
       showErrorMessage(context, message: 'Submission failed. Try again.');
     }

@@ -448,9 +448,16 @@ class _LoginPageState extends State<LoginPage>
     setState(() => isLoading = true);
 
     try {
-      final deviceToken = await FirebaseMessaging.instance.getToken();
-      if (deviceToken == null) {
-        throw Exception('Failed to retrieve device token.');
+      String? deviceToken = '';
+      try {
+        // deviceToken = await FirebaseMessaging.instance.getToken();
+
+        deviceToken = await FirebaseMessaging.instance.getToken();
+        if (deviceToken == null) {
+          throw Exception('Failed to retrieve device token.');
+        }
+      } catch (e) {
+        print("Error retrieving device token: $e");
       }
 
       final response = await LeadsSrv.onLogin({

@@ -419,6 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: const Color(0xFF1380FE),
                 title: Text(
                   ' $greeting',
+                  textAlign: TextAlign.start,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,

@@ -1180,7 +1180,7 @@ class _CreateTestdriveState extends State<CreateTestdrive> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Form Submit Successful.')));
       widget.onFormSubmit?.call(); // Refresh dashboard data
-      widget.onTabChange?.call(1);
+      widget.onTabChange?.call(2);
     } else {
       showErrorMessage(context, message: 'Failed to submit appointment.');
     }

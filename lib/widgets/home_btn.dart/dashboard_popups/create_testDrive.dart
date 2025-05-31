@@ -19,7 +19,12 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class CreateTestdrive extends StatefulWidget {
   final Function onFormSubmit;
-  const CreateTestdrive({super.key, required this.onFormSubmit});
+  final Function(int)? onTabChange;
+  const CreateTestdrive({
+    super.key,
+    required this.onFormSubmit,
+    this.onTabChange,
+  });
 
   @override
   State<CreateTestdrive> createState() => _CreateTestdriveState();
@@ -1174,7 +1179,8 @@ class _CreateTestdriveState extends State<CreateTestdrive> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Form Submit Successful.')));
-      widget.onFormSubmit();
+      widget.onFormSubmit?.call(); // Refresh dashboard data
+      widget.onTabChange?.call(1);
     } else {
       showErrorMessage(context, message: 'Failed to submit appointment.');
     }

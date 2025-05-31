@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartassist/config/component/color/colors.dart';
 import 'package:smartassist/config/component/font/font.dart';
+import 'package:smartassist/config/controller/tab_controller.dart';
 import 'package:smartassist/config/getX/fab.controller.dart';
 import 'package:smartassist/pages/home/gloabal_search_page/global_search.dart';
 import 'package:smartassist/pages/notification/notification.dart';
@@ -35,6 +36,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentTabIndex = 0; // Track which tab is active
+  late TabControllerNew _tabController;
   String? leadId;
   bool _isHidden = false;
   String greeting = '';
@@ -70,18 +73,35 @@ class _HomeScreenState extends State<HomeScreen> {
   // Initialize the controller
   final FabController fabController = Get.put(FabController());
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _tabController = TabControllerNew();
+  //   _tabController.addListener(_onTabChanged);
+  //   fetchDashboardData();
+  //   _searchController.addListener(_onSearchChanged);
+  //   _loadDashboardAnalytics();
+  //   _loadTeamRole();
+  //   print(_loadTeamRole());
+  //   // uploadCallLogsAfterLogin();
+
+  //   // Or this alternative:
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     uploadCallLogsAfterLogin();
+  //   });
+  // }
   @override
   void initState() {
     super.initState();
-    fetchDashboardData();
+    _tabController = TabControllerNew();
+    _tabController.addListener(_onTabChanged);
     _searchController.addListener(_onSearchChanged);
-    _loadDashboardAnalytics();
-    _loadTeamRole();
-    print(_loadTeamRole());
-    // uploadCallLogsAfterLogin();
 
-    // Or this alternative:
+    // Move async operations to after controller initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchDashboardData();
+      _loadDashboardAnalytics();
+      _loadTeamRole();
       uploadCallLogsAfterLogin();
     });
   }
@@ -114,6 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
+
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
@@ -178,6 +200,20 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print('Upload error: $e');
+    }
+  }
+
+  // Handle form submission from popups
+  Future<void> _handleFormSubmit() async {
+    await fetchDashboardData();
+    // Don't change tab here unless you want to
+  }
+
+  void _onTabChanged() {
+    if (mounted) {
+      setState(() {
+        // Just trigger rebuild, no need to change any state
+      });
     }
   }
 
@@ -334,12 +370,20 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: AppointmentPopup(
-              onFormSubmit: fetchDashboardData,
+              // onFormSubmit: fetchDashboardData,
+              onFormSubmit: _handleFormSubmit,
+              onTabChange: _handleTabChangeFromPopup,
             ), // Appointment modal
           ),
         );
       },
     );
+  }
+
+  // Handle tab change from popup
+  void _handleTabChangeFromPopup(int tabIndex) {
+    // Use controller to change tab
+    _tabController.changeTab(tabIndex);
   }
 
   void _showTestdrivePopup(BuildContext context) {
@@ -360,7 +404,8 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: CreateTestdrive(
-              onFormSubmit: fetchDashboardData,
+                  onFormSubmit: _handleFormSubmit,
+              onTabChange: _handleTabChangeFromPopup,
             ), // Appointment modal
           ),
         );
@@ -391,17 +436,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-  // String _getFirstTwoLettersCapitalized(String input) {
-  //   input = input.trim(); // Remove any extra spaces
-  //   if (input.length >= 1) {
-  //     return input.substring(0, 1).toUpperCase();
-  //   } else if (input.isNotEmpty) {
-  //     return input.toUpperCase();
-  //   } else {
-  //     return '';
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -648,6 +682,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         overdueAppointmentsCount,
                                     overdueTestDrivesCount:
                                         overdueTestDrivesCount,
+                                    tabController: _tabController,
                                   ),
                                   const BottomBtnSecond(
                                     // MtdData: MtdData,
@@ -913,7 +948,8 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: CreateFollowupsPopups(
-              onFormSubmit: fetchDashboardData, // Pass the function here
+                  onFormSubmit: _handleFormSubmit,
+              onTabChange: _handleTabChangeFromPopup, // Pass the function here
             ),
           ),
         );

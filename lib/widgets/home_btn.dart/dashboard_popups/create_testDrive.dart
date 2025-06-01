@@ -34,6 +34,9 @@ class _CreateTestdriveState extends State<CreateTestdrive> {
   String? _leadId;
   String? _leadName;
   bool isSubmitting = false;
+  String? selectedVehicleName;
+  String? selectedBrand;
+  Map<String, dynamic>? selectedVehicleData;
   // final PageController _pageController = PageController();
   List<Map<String, String>> dropdownItems = [];
   bool isLoading = false;
@@ -47,7 +50,7 @@ class _CreateTestdriveState extends State<CreateTestdrive> {
   String? selectedPriority;
   List<dynamic> vehicleList = [];
   List<String> uniqueVehicleNames = [];
-  String? selectedVehicleName;
+  // String? selectedVehicleName;
   List<dynamic> _searchResults = [];
   List<dynamic> _searchResults1 = [];
   // List<dynamic> _searchResults = [];
@@ -555,12 +558,25 @@ class _CreateTestdriveState extends State<CreateTestdrive> {
               //   height: 10,
               // ),
               // _buildSearchField1(),
+              // VehiclesearchTextfield(
+              //   onVehicleSelected: (selectedVehicleName) {
+              //     setState(() {
+              //       this.selectedVehicleName = selectedVehicleName;
+              //     });
+              //     print("Selected Vehicle: $selectedVehicleName");
+              //   },
+              // ),
               VehiclesearchTextfield(
-                onVehicleSelected: (selectedVehicleName) {
+                onVehicleSelected: (selectedVehicle) {
                   setState(() {
-                    this.selectedVehicleName = selectedVehicleName;
+                    selectedVehicleData = selectedVehicle;
+                    selectedVehicleName = selectedVehicle['vehicle_name'];
+                    selectedBrand =
+                        selectedVehicle['brand'] ?? ''; // Handle null brand
                   });
+
                   print("Selected Vehicle: $selectedVehicleName");
+                  print("Selected Brand: ${selectedBrand ?? 'No Brand'}");
                 },
               ),
               // const SizedBox(height: 20),
@@ -1163,7 +1179,8 @@ class _CreateTestdriveState extends State<CreateTestdrive> {
       'end_date': formattedEndDate,
       'start_time': formattedStartTime,
       'end_time': formattedEndTime,
-      'PMI': vehicleName,
+      'PMI': selectedVehicleName,
+      // 'brand' :
       'location': _locationController.text,
       'sp_id': spId,
       'remarks': descriptionController.text,

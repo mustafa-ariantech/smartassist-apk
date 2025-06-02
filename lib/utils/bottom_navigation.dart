@@ -242,7 +242,7 @@ class BottomNavigation extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.people_alt_outlined, size: 28),
               title: Text(
-                'Enquiries',
+                'My enquiries',
                 style: GoogleFonts.poppins(fontSize: 18),
               ),
               onTap: () => Get.to(() => const AllLeads()),
@@ -250,7 +250,7 @@ class BottomNavigation extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.call_outlined, size: 28),
               title: Text(
-                'Call Analysis',
+                'My Call Analysis',
                 style: GoogleFonts.poppins(fontSize: 18),
               ),
               onTap: () => Get.to(

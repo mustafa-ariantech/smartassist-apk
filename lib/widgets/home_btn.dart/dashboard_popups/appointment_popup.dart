@@ -16,7 +16,12 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class AppointmentPopup extends StatefulWidget {
   final Function onFormSubmit;
-  const AppointmentPopup({super.key, required this.onFormSubmit});
+  final Function(int)? onTabChange;
+  const AppointmentPopup({
+    super.key,
+    required this.onFormSubmit,
+    this.onTabChange,
+  });
 
   @override
   State<AppointmentPopup> createState() => _AppointmentPopupState();
@@ -1049,7 +1054,9 @@ class _AppointmentPopupState extends State<AppointmentPopup> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Form Submit Successful.')),
         );
-        widget.onFormSubmit();
+        // widget.onFormSubmit();
+        widget.onFormSubmit?.call(); // Refresh dashboard data
+        widget.onTabChange?.call(1);
       } else {
         showErrorMessage(context, message: 'Failed to submit appointment.');
       }

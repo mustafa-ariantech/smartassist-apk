@@ -4,8 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart'; 
-import 'package:hive_flutter/hive_flutter.dart'; 
+import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:smartassist/config/route/route.dart';
 import 'package:smartassist/config/route/route_name.dart';
@@ -17,15 +17,21 @@ void main() async {
 
   try {
     await Firebase.initializeApp();
-    SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
     print("Firebase initialized successfully!");
   } catch (e) {
     print("Firebase initialization failed: $e");
   }
 
   await Hive.initFlutter(); // Initialize Hive after Firebase
-  await NotificationService.instance.initialize(); // Initialize Notifications
+  try {
+    await NotificationService.instance.initialize(); // Initialize Notifications
+  } catch (e) {
+    print("Firebase initialization failed: $e");
+  }
   // Initialize connection service
   await ConnectionService().initialize();
 
@@ -45,8 +51,9 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           builder: (context, widget) {
             return MediaQuery(
-              data: MediaQuery.of(context)
-                  .copyWith(textScaler: const TextScaler.linear(1.0)),
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(1.0)),
               child: widget!,
             );
           },

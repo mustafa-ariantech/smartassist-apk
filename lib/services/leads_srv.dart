@@ -408,7 +408,7 @@ class LeadsSrv {
 
     try {
       final response = await http.post(
-        Uri.parse('${baseUrl}admin/records/$leadId/events/create-appointment'),
+        Uri.parse('${baseUrl}admin/records/$leadId/tasks/create-appointment'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1353,13 +1353,11 @@ class LeadsSrv {
     }
   }
 
-  static Future<Map<String, dynamic>> vehicleSearch(String query) async {
+  static Future<Map<String, dynamic>> getAllVehicles() async {
     try {
       final token = await Storage.getToken();
       final response = await http.get(
-        Uri.parse(
-          '${baseUrl}search/vehicles?vehicle=${Uri.encodeComponent(query)}',
-        ),
+        Uri.parse('${baseUrl}users/vehicles/all'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1368,7 +1366,7 @@ class LeadsSrv {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        return {'success': true, 'data': data['data']['suggestions'] ?? []};
+        return {'success': true, 'data': data['data']['rows'] ?? []};
       } else {
         return {
           'success': false,
@@ -1379,6 +1377,33 @@ class LeadsSrv {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  // static Future<Map<String, dynamic>> vehicleSearch(String query) async {
+  //   try {
+  //     final token = await Storage.getToken();
+  //     final response = await http.get(
+  //       Uri.parse(
+  //         '${baseUrl}search/vehicles?vehicle=${Uri.encodeComponent(query)}',
+  //       ),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> data = json.decode(response.body);
+  //       return {'success': true, 'data': data['data']['suggestions'] ?? []};
+  //     } else {
+  //       return {
+  //         'success': false,
+  //         'error': 'HTTP ${response.statusCode}: ${response.reasonPhrase}',
+  //       };
+  //     }
+  //   } catch (e) {
+  //     return {'success': false, 'error': e.toString()};
+  //   }
+  // }
 
   static Future<Map<String, dynamic>> globalSearch(String query) async {
     try {

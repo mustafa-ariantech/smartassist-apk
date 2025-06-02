@@ -842,7 +842,7 @@ class _ThreebtnState extends State<Threebtn> {
                     : const Color(0xff000000).withOpacity(0.56),
               ),
             ),
-            if (showCount && overdueCount > 0)
+            if (showCount)
               Text(
                 '($overdueCount)',
                 style: GoogleFonts.poppins(
@@ -853,6 +853,18 @@ class _ThreebtnState extends State<Threebtn> {
                       : const Color(0xff000000).withOpacity(0.56),
                 ),
               ),
+
+            // if (showCount && overdueCount > 0)
+            //   Text(
+            //     '($overdueCount)',
+            //     style: GoogleFonts.poppins(
+            //       fontSize: 10,
+            //       fontWeight: FontWeight.w400,
+            //       color: isActive
+            //           ? const Color.fromRGBO(236, 81, 81, 1)
+            //           : const Color(0xff000000).withOpacity(0.56),
+            //     ),
+            //   ),
           ],
         ),
       ),
@@ -910,4 +922,4 @@ class _ThreebtnState extends State<Threebtn> {
         return 0;
     }
   }
-} 
+}

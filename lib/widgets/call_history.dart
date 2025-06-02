@@ -370,8 +370,9 @@ class _CallHistoryState extends State<CallHistory> {
   }
 
   String formatDate(DateTime date) {
-    return DateFormat('yyyy/MM/dd')
-        .format(date); // Formats the date to "YYYY/MM/dd"
+    return DateFormat(
+      'yyyy/MM/dd',
+    ).format(date); // Formats the date to "YYYY/MM/dd"
   }
 
   String _getFormattedDateString(Map<String, dynamic> call) {
@@ -397,12 +398,15 @@ class _CallHistoryState extends State<CallHistory> {
   // Fetch call logs based on the category, mobile number, and date
   Future<void> _fetchCallLogs() async {
     try {
-      final data =
-          await fetchCallLogs(widget.mobile, widget.category, _periodFilter);
+      final data = await fetchCallLogs(
+        widget.mobile,
+        widget.category,
+        _periodFilter,
+      );
       setState(() {
         _callLogs = data['logs']['rows']; // Store the call logs
-        _totalDuration =
-            data['totalDurationInMins'].toString(); // Store total duration
+        _totalDuration = data['totalDurationInMins']
+            .toString(); // Store total duration
         _totalCalls = data['logs']['count']; // Store total call count
         _isLoading = false;
       });
@@ -412,7 +416,10 @@ class _CallHistoryState extends State<CallHistory> {
   }
 
   Future<Map<String, dynamic>> fetchCallLogs(
-      String mobile, String category, String periodFilter) async {
+    String mobile,
+    String category,
+    String periodFilter,
+  ) async {
     // If callDate is empty, omit the call_date query parameter from the URL
     String apiUrl =
         "https://dev.smartassistapp.in/api/leads/call-logs/all?category=$category&mobile=${Uri.encodeComponent(mobile)}";
@@ -459,11 +466,14 @@ class _CallHistoryState extends State<CallHistory> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(width: 4),
-        Text(formattedTime,
-            style: GoogleFonts.poppins(
-                color: AppColors.fontColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 14)),
+        Text(
+          formattedTime,
+          style: GoogleFonts.poppins(
+            color: AppColors.fontColor,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
       ],
     );
   }
@@ -515,11 +525,15 @@ class _CallHistoryState extends State<CallHistory> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('$_categoryTitle Calls',
-            style: AppFont.appbarfontgrey(context)),
+        title: Text(
+          '$_categoryTitle Calls',
+          style: AppFont.appbarfontgrey(context),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_outlined,
-              color: AppColors.iconGrey),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_outlined,
+            color: AppColors.iconGrey,
+          ),
           onPressed: () {
             Navigator.pop(context, true);
           },
@@ -597,8 +611,13 @@ class _CallHistoryState extends State<CallHistory> {
     );
   }
 
-  Widget _buildInfoCard1(BuildContext context, String title, String value,
-      double screenWidth, Color valueColor) {
+  Widget _buildInfoCard1(
+    BuildContext context,
+    String title,
+    String value,
+    double screenWidth,
+    Color valueColor,
+  ) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
@@ -621,7 +640,10 @@ class _CallHistoryState extends State<CallHistory> {
               maxLines: 4,
               value,
               style: GoogleFonts.poppins(
-                  fontSize: 20, fontWeight: FontWeight.w600, color: valueColor),
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: valueColor,
+              ),
             ),
             const SizedBox(height: 5),
             Expanded(
@@ -632,9 +654,10 @@ class _CallHistoryState extends State<CallHistory> {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 4,
                 style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.fontColor),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.fontColor,
+                ),
               ),
             ),
           ],
@@ -847,7 +870,8 @@ class _CallHistoryState extends State<CallHistory> {
               _childButtonIndex = index;
             });
             _updateDateFilter(
-                text); // Update the date filter based on the selected button
+              text,
+            ); // Update the date filter based on the selected button
           },
           style: TextButton.styleFrom(
             foregroundColor: isSelected ? Colors.blue : Colors.black,

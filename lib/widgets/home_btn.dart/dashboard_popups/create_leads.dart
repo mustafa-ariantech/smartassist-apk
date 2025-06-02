@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartassist/services/leads_srv.dart';
 import 'package:smartassist/utils/storage.dart';
 import 'package:smartassist/widgets/google_location.dart';
+import 'package:smartassist/widgets/popups_widget/vehicleSearch_textfield.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class CreateLeads extends StatefulWidget {
@@ -26,6 +27,9 @@ class CreateLeads extends StatefulWidget {
 }
 
 class _CreateLeadsState extends State<CreateLeads> {
+  String? selectedVehicleName;
+  String? selectedBrand;
+  Map<String, dynamic>? selectedVehicleData;
   final PageController _pageController = PageController();
   List<Map<String, String>> dropdownItems = [];
   // final _formKey = GlobalKey<FormState>();
@@ -34,7 +38,7 @@ class _CreateLeadsState extends State<CreateLeads> {
   int _currentStep = 0;
   List<dynamic> vehicleList = [];
   List<String> uniqueVehicleNames = [];
-  String? selectedVehicleName;
+  // String? selectedVehicleName;
   late stt.SpeechToText _speech;
   bool _isListening = false;
   bool isSubmitting = false;
@@ -167,7 +171,7 @@ class _CreateLeadsState extends State<CreateLeads> {
     try {
       final response = await http.get(
         Uri.parse(
-          'https://api.smartassistapp.in/api/search/vehicles?vehicle=${Uri.encodeComponent(query)}',
+          'https://dev.smartassistapp.in/api/search/vehicles?vehicle=${Uri.encodeComponent(query)}',
         ),
         headers: {
           'Authorization': 'Bearer $token',
@@ -236,7 +240,7 @@ class _CreateLeadsState extends State<CreateLeads> {
       final token = await Storage.getToken();
 
       final apiUrl =
-          'https://api.smartassistapp.in/api/search/vehicle-color?color=$query';
+          'https://dev.smartassistapp.in/api/search/vehicle-color?color=$query';
       print("API URL: $apiUrl"); // Debug URL
 
       final response = await http.get(
@@ -293,7 +297,7 @@ class _CreateLeadsState extends State<CreateLeads> {
   //   final encodedName = Uri.encodeComponent(vehicleName);
 
   //   final url =
-  //       'https://api.smartassistapp.in/api/users/vehicles/all?vehicle_name=$encodedName';
+  //       'https://dev.smartassistapp.in/api/users/vehicles/all?vehicle_name=$encodedName';
 
   //   try {
   //     final response = await http.get(
@@ -352,7 +356,7 @@ class _CreateLeadsState extends State<CreateLeads> {
     try {
       final response = await http.get(
         Uri.parse(
-          'https://api.smartassistapp.in/api/leads/existing-check?mobile=$encodedMobile',
+          'https://dev.smartassistapp.in/api/leads/existing-check?mobile=$encodedMobile',
         ),
         headers: {
           'Authorization': 'Bearer $token',
@@ -465,10 +469,10 @@ class _CreateLeadsState extends State<CreateLeads> {
         isValid = false;
       }
 
-      if (_selectedType.isEmpty) {
-        _errors['leadSource'] = 'Please select a brand';
-        isValid = false;
-      }
+      // if (_selectedType.isEmpty) {
+      //   _errors['leadSource'] = 'Please select a brand';
+      //   isValid = false;
+      // }
     });
 
     return isValid;
@@ -481,10 +485,10 @@ class _CreateLeadsState extends State<CreateLeads> {
       _errors = {}; // Clear previous errors
 
       // Validate brand
-      if (_selectedBrand.isEmpty) {
-        _errors['brand'] = 'Please select a brand';
-        isValid = false;
-      }
+      // if (_selectedBrand.isEmpty) {
+      //   _errors['brand'] = 'Please select a brand';
+      //   isValid = false;
+      // }
 
       // Validate fuel type
       // if (_selectedFuel.isEmpty) {
@@ -505,10 +509,10 @@ class _CreateLeadsState extends State<CreateLeads> {
       }
 
       // Validate primary model interest
-      if (modelInterestController.text.trim().isEmpty) {
-        _errors['model'] = 'Primary model interest is required';
-        isValid = false;
-      }
+      // if (modelInterestController.text.trim().isEmpty) {
+      //   _errors['model'] = 'Primary model interest is required';
+      //   isValid = false;
+      // }
 
       // Validate expected purchase date
       // if (endDateController.text.trim().isEmpty) {
@@ -951,46 +955,62 @@ class _CreateLeadsState extends State<CreateLeads> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildAmountRange(isRequired: true),
+                      VehiclesearchTextfield(
+                        onVehicleSelected: (selectedVehicle) {
+                          setState(() {
+                            selectedVehicleData = selectedVehicle;
+                            selectedVehicleName =
+                                selectedVehicle['vehicle_name'];
+                            selectedBrand =
+                                selectedVehicle['brand'] ??
+                                ''; // Handle null brand
+                          });
 
-                      _buildSearchField(
-                        errorText: _errors['model'],
-                        onChanged: (value) {
-                          if (_errors.containsKey('model')) {
-                            setState(() {
-                              _errors.remove('model');
-                            });
-                          }
+                          print("Selected Vehicle: $selectedVehicleName");
+                          print(
+                            "Selected Brand: ${selectedBrand ?? 'No Brand'}",
+                          );
                         },
-                        // onChanged: (value) {
-                        //   setState(() {
-                        //     modelInterestController = value;
-                        //     if (_errors.containsKey('model')) {
-                        //       _errors.remove('model');
-                        //     }
-                        //   });
-                        // },
                       ),
+                      // _buildSearchField(
+                      //   errorText: _errors['model'],
+                      //   onChanged: (value) {
+                      //     if (_errors.containsKey('model')) {
+                      //       setState(() {
+                      //         _errors.remove('model');
+                      //       });
+                      //     }
+                      //   },
+                      //   // onChanged: (value) {
+                      //   //   setState(() {
+                      //   //     modelInterestController = value;
+                      //   //     if (_errors.containsKey('model')) {
+                      //   //       _errors.remove('model');
+                      //   //     }
+                      //   //   });
+                      //   // },
+                      // ),
                       const SizedBox(height: 10),
                       _buildVehicleColorSearch(),
                       const SizedBox(height: 10),
-                      _buildButtonsFloat(
-                        isRequired: true,
-                        options: {
-                          "Jaguar": "Jaguar",
-                          "Land Rover": "Land Rover",
-                        },
-                        groupValue: _selectedBrand,
-                        label: 'Brand',
-                        errorText: _errors['brand'],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedBrand = value;
-                            if (_errors.containsKey('brand')) {
-                              _errors.remove('brand');
-                            }
-                          });
-                        },
-                      ),
+                      // _buildButtonsFloat(
+                      //   isRequired: true,
+                      //   options: {
+                      //     "Jaguar": "Jaguar",
+                      //     "Land Rover": "Land Rover",
+                      //   },
+                      //   groupValue: _selectedBrand,
+                      //   label: 'Brand',
+                      //   errorText: _errors['brand'],
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       _selectedBrand = value;
+                      //       if (_errors.containsKey('brand')) {
+                      //         _errors.remove('brand');
+                      //       }
+                      //     });
+                      //   },
+                      // ),
                       const SizedBox(height: 10),
                       // const SizedBox(
                       //   height: 10,
@@ -2620,7 +2640,7 @@ class _CreateLeadsState extends State<CreateLeads> {
         'email': emailController.text,
         'mobile': mobileNumber,
         'purchase_type': _selectedPurchaseType,
-        'brand': _selectedBrand,
+        'brand': selectedBrand ?? '',
         'type': 'Product',
         'sub_type': selectedSubType,
         // 'sp_id': spId,

@@ -36,11 +36,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> fetchProfileData() async {
     final token = await Storage.getToken();
     final response = await http.get(
-        Uri.parse('https://dev.smartassistapp.in/api/users/show-profile'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        });
+      Uri.parse('https://dev.smartassistapp.in/api/users/show-profile'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -83,8 +84,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (pickedFile == null) return;
 
@@ -96,8 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     final token = await Storage.getToken();
-    final uri =
-        Uri.parse('https://dev.smartassistapp.in/api/users/profile/set');
+    final uri = Uri.parse(
+      'https://dev.smartassistapp.in/api/users/profile/set',
+    );
 
     final request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $token'
@@ -180,20 +183,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   backgroundImage: FileImage(_profileImage!),
                                 )
                               : (profilePic != null && profilePic!.isNotEmpty
-                                  ? CircleAvatar(
-                                      radius: 60,
-                                      backgroundImage:
-                                          NetworkImage(profilePic!),
-                                    )
-                                  : CircleAvatar(
-                                      radius: 60,
-                                      backgroundColor: Colors.grey[300],
-                                      child: Icon(
-                                        Icons.person,
-                                        size: 60,
-                                        color: Colors.grey[700],
-                                      ),
-                                    )),
+                                    ? CircleAvatar(
+                                        radius: 60,
+                                        backgroundImage: NetworkImage(
+                                          profilePic!,
+                                        ),
+                                      )
+                                    : CircleAvatar(
+                                        radius: 60,
+                                        backgroundColor: Colors.grey[300],
+                                        child: Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: Colors.grey[700],
+                                        ),
+                                      )),
                           if (_isUploading) const CircularProgressIndicator(),
                           Positioned(
                             bottom: -8,
@@ -215,8 +219,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     const SizedBox(height: 10),
                     Text(name ?? '', style: AppFont.popupTitleBlack(context)),
-                    Text(userRole ?? 'User',
-                        style: AppFont.mediumText14(context)),
+                    Text(
+                      userRole ?? 'User',
+                      style: AppFont.mediumText14(context),
+                    ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -238,11 +244,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Profile details (Email, Location, Mobile)
                     Container(
                       decoration: BoxDecoration(
-                          color: AppColors.backgroundLightGrey,
-                          borderRadius: BorderRadius.circular(10)),
+                        color: AppColors.backgroundLightGrey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 15),
+                          horizontal: 20.0,
+                          vertical: 15,
+                        ),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Column(
@@ -250,14 +259,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildProfileItem('Email', email ?? ''),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              const SizedBox(height: 10),
                               _buildProfileItem('Location', location ?? ''),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              _buildProfileItem('Mobile', mobile ?? '')
+                              const SizedBox(height: 10),
+                              _buildProfileItem('Mobile', mobile ?? ''),
                             ],
                           ),
                         ),
@@ -269,43 +274,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     Container(
                       decoration: BoxDecoration(
-                          color: AppColors.backgroundLightGrey,
-                          borderRadius: BorderRadius.circular(10)),
+                        color: AppColors.backgroundLightGrey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 15),
+                          horizontal: 10.0,
+                          vertical: 15,
+                        ),
                         child: Column(
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(left: 10.0),
                               child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text('Evaluation',
-                                    style: AppFont.popupTitleBlack16(context)),
+                                child: Text(
+                                  'Evaluation',
+                                  style: AppFont.popupTitleBlack16(context),
+                                ),
                               ),
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            const SizedBox(height: 10),
                             _buildEvaluationProgress(
-                                'Professionalism', professionalism),
-                            const SizedBox(
-                              height: 5,
+                              'Professionalism',
+                              professionalism,
                             ),
+                            const SizedBox(height: 5),
                             _buildEvaluationProgress(
-                                'Efficiency of service call handling',
-                                efficiency),
-                            const SizedBox(
-                              height: 5,
+                              'Efficiency of service call handling',
+                              efficiency,
                             ),
+                            const SizedBox(height: 5),
                             _buildEvaluationProgress(
-                                'Response time of service calls', responseTime),
-                            const SizedBox(
-                              height: 5,
+                              'Response time of service calls',
+                              responseTime,
                             ),
+                            const SizedBox(height: 5),
                             _buildEvaluationProgress(
-                                'Product Knowledge & Brand Representation',
-                                productKnowledge),
+                              'Product Knowledge & Brand Representation',
+                              productKnowledge,
+                            ),
                           ],
                         ),
                       ),
@@ -322,20 +330,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-                softWrap: true,
-                maxLines: 3,
-                label,
-                style: AppFont.mediumText14(context))),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            softWrap: true,
+            maxLines: 3,
+            label,
+            style: AppFont.mediumText14(context),
+          ),
+        ),
         const SizedBox(height: 5),
         Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-                softWrap: true,
-                maxLines: 3,
-                value,
-                style: AppFont.dropDowmLabel(context))),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            softWrap: true,
+            maxLines: 3,
+            value,
+            style: AppFont.dropDowmLabel(context),
+          ),
+        ),
       ],
     );
   }
@@ -354,9 +366,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Text(
             '${(percentage * 100).toStringAsFixed(0)}%',
             style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: _getGradientForProgress(percentage).last),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: _getGradientForProgress(percentage).last,
+            ),
             softWrap: true,
             maxLines: 3,
           ),

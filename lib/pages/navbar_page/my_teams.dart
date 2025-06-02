@@ -34,6 +34,7 @@ class _MyTeamsState extends State<MyTeams> {
   int _selectedProfileIndex = 0; // Default to 'All' profile
   String _selectedUserId = '';
   bool _isComparing = false;
+  int count = 0;
   // String userId = '';
   // bool isLoading = false;
   // String _selectedCheckboxIds = '';
@@ -2239,7 +2240,7 @@ class _MyTeamsState extends State<MyTeams> {
                       ),
                       _buildFilterButton(
                         index: 1,
-                        text: 'Overdue',
+                        text: 'Overdue ($count)',
                         activeColor: const Color.fromRGBO(238, 59, 59, 1),
                       ),
                     ],
@@ -2299,6 +2300,8 @@ class _MyTeamsState extends State<MyTeams> {
               _upcomingTestDrives = List<Map<String, dynamic>>.from(
                 overdue['overdueTestDrives'] ?? [],
               );
+
+              count = overdue['count']?.length ?? 0;
             }
           });
         },

@@ -103,8 +103,10 @@ class _LeadTextfieldState extends State<LeadTextfield> {
           _searchResults = result['data'];
         });
       } else {
-        showErrorMessage(context,
-            message: result['error'] ?? 'Something went wrong..!');
+        showErrorMessage(
+          context,
+          message: result['error'] ?? 'Something went wrong..!',
+        );
       }
     } catch (e) {
       showErrorMessage(context, message: 'Something went wrong..!');
@@ -135,35 +137,38 @@ class _LeadTextfieldState extends State<LeadTextfield> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                      filled: true,
-                      fillColor: AppColors.containerBg,
-                      hintText: selectedLeadsName ?? 'Select Leads',
-                      hintStyle: TextStyle(
-                        color: selectedLeadsName != null
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                      prefixIcon: const Icon(
-                        FontAwesomeIcons.magnifyingGlass,
-                        size: 15,
-                        color: AppColors.fontColor,
-                      ),
-                      // suffixIcon: IconButton(
-                      //   icon: const Icon(
-                      //     FontAwesomeIcons.microphone,
-                      //     color: AppColors.fontColor,
-                      //     size: 15,
-                      //   ),
-                      //   onPressed: () {
-                      //     print('Microphone button pressed');
-                      //   },
-                      // ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 10)),
+                    filled: true,
+                    fillColor: AppColors.containerBg,
+                    hintText: selectedLeadsName ?? 'Select Leads',
+                    hintStyle: TextStyle(
+                      color: selectedLeadsName != null
+                          ? Colors.black
+                          : Colors.grey,
+                    ),
+                    prefixIcon: const Icon(
+                      FontAwesomeIcons.magnifyingGlass,
+                      size: 15,
+                      color: AppColors.fontColor,
+                    ),
+                    // suffixIcon: IconButton(
+                    //   icon: const Icon(
+                    //     FontAwesomeIcons.microphone,
+                    //     color: AppColors.fontColor,
+                    //     size: 15,
+                    //   ),
+                    //   onPressed: () {
+                    //     print('Microphone button pressed');
+                    //   },
+                    // ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 10,
+                    ),
+                  ),
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -190,7 +195,7 @@ class _LeadTextfieldState extends State<LeadTextfield> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(5),
               boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 4)
+                BoxShadow(color: Colors.black12, blurRadius: 4),
               ],
             ),
             child: ListView.builder(
@@ -210,7 +215,9 @@ class _LeadTextfieldState extends State<LeadTextfield> {
                     });
                     if (widget.onLeadSelected != null) {
                       widget.onLeadSelected!(
-                          selectedLeads!, selectedLeadsName!);
+                        selectedLeads!,
+                        selectedLeadsName!,
+                      );
                     }
                   },
                   title: Row(
@@ -219,18 +226,14 @@ class _LeadTextfieldState extends State<LeadTextfield> {
                         result['lead_name'] ?? 'No Name',
                         style: AppFont.dropDowmLabel(context),
                       ),
-                      const SizedBox(
-                        width: 5,
-                      ),
+                      const SizedBox(width: 5),
                       // Divider Replacement: A Thin Line
                       Container(
                         width: .5, // Set width for the divider
                         height: 15, // Make it a thin horizontal line
                         color: Colors.black,
                       ),
-                      const SizedBox(
-                        width: 5,
-                      ),
+                      const SizedBox(width: 5),
                       Text(
                         result['PMI'] ?? 'Discovery Sport',
                         style: AppFont.tinytext(context),

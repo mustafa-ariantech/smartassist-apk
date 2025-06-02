@@ -15,7 +15,9 @@ class CreateFollowupsPopups extends StatefulWidget {
   final Function onFormSubmit;
   final Function(int)? onTabChange;
 
-  const CreateFollowupsPopups({super.key, required this.onFormSubmit ,
+  const CreateFollowupsPopups({
+    super.key,
+    required this.onFormSubmit,
     this.onTabChange,
   });
 
@@ -291,8 +293,8 @@ class _CreateFollowupsPopupsState extends State<CreateFollowupsPopups> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Follow-up submitted successfully!')),
       );
-       widget.onFormSubmit?.call(); // Refresh dashboard data
-      widget.onTabChange?.call(0); 
+      widget.onFormSubmit?.call(); // Refresh dashboard data
+      widget.onTabChange?.call(0);
     } else {
       showErrorMessage(context, message: 'Submission failed. Try again.');
     }

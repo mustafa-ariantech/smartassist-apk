@@ -29,6 +29,7 @@ class _AllTestdriveState extends State<AllTestdrive> {
   int _upcommingButtonIndex = 0;
   TextEditingController searchController = TextEditingController();
   bool _isLoading = true;
+  int count = 0;
 
   @override
   void initState() {
@@ -41,7 +42,7 @@ class _AllTestdriveState extends State<AllTestdrive> {
     try {
       final token = await Storage.getToken();
       const String apiUrl =
-          "https://dev.smartassistapp.in/api/events/all-events?category=Test%20Drive";
+          "https://dev.smartassistapp.in/api/events/all-events";
 
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -54,6 +55,7 @@ class _AllTestdriveState extends State<AllTestdrive> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         setState(() {
+          count = data['data']['overdueEvents']?['count'] ?? 0;
           _originalAllTasks = data['data']['allEvents']?['rows'] ?? [];
           _originalUpcomingTasks =
               data['data']['upcomingEvents']?['rows'] ?? [];
@@ -196,29 +198,22 @@ class _AllTestdriveState extends State<AllTestdrive> {
                       child: Row(
                         children: [
                           _buildFilterButton(
+                            color: AppColors.colorsBlue,
                             index: 0,
                             text: 'All',
-                            activeColor: const Color.fromARGB(
-                              255,
-                              159,
-                              174,
-                              239,
-                            ),
+                            activeColor: AppColors.colorsBlue.withOpacity(0.2),
                           ),
                           _buildFilterButton(
+                            color: AppColors.sideGreen,
                             index: 1,
                             text: 'Upcoming',
-                            activeColor: const Color.fromARGB(
-                              255,
-                              81,
-                              223,
-                              121,
-                            ),
+                            activeColor: AppColors.sideGreen.withOpacity(0.2),
                           ),
                           _buildFilterButton(
+                            color: AppColors.sideRed,
                             index: 2,
-                            text: 'Overdue',
-                            activeColor: const Color.fromRGBO(238, 59, 59, 1),
+                            text: 'Overdue ($count)',
+                            activeColor: AppColors.sideRed.withOpacity(0.2),
                           ),
                         ],
                       ),
@@ -289,22 +284,19 @@ class _AllTestdriveState extends State<AllTestdrive> {
     required int index,
     required String text,
     required Color activeColor,
+    required Color color,
   }) {
+    final bool isActive = _upcommingButtonIndex == index;
+
     return Expanded(
       child: TextButton(
         onPressed: () => setState(() => _upcommingButtonIndex = index),
         style: TextButton.styleFrom(
-          backgroundColor: _upcommingButtonIndex == index
-              ? activeColor.withOpacity(0.29)
-              : null,
-          foregroundColor: _upcommingButtonIndex == index
-              ? Colors.blueGrey
-              : Colors.black,
+          backgroundColor: isActive ? activeColor.withOpacity(0.29) : null,
+          foregroundColor: isActive ? Colors.blueGrey : Colors.black,
           padding: const EdgeInsets.symmetric(vertical: 5),
           side: BorderSide(
-            color: _upcommingButtonIndex == index
-                ? activeColor
-                : Colors.transparent,
+            color: isActive ? activeColor : Colors.transparent,
             width: .5,
           ),
           shape: RoundedRectangleBorder(
@@ -313,10 +305,10 @@ class _AllTestdriveState extends State<AllTestdrive> {
         ),
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 12,
+          style: TextStyle(
+            fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: Colors.grey,
+            color: isActive ? color : Colors.grey,
           ),
         ),
       ),

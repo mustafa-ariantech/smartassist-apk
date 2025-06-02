@@ -36,6 +36,7 @@ import 'package:smartassist/pages/Calendar/calender.dart';
 import 'package:smartassist/utils/token_manager.dart';
 import 'package:smartassist/widgets/myteam.dart';
 import 'package:smartassist/widgets/timeline_view_calender.dart'; // Adjust your imports based on your actual page locations
+import 'package:smartassist/pages/Calendar/calendar_sm.dart'; // Adjust your imports based on your actual page locations
 
 // class NavigationController extends GetxController {
 //   // Observable to track selected index in bottom navigation
@@ -89,8 +90,17 @@ class NavigationController extends GetxController {
     ];
 
     // Insert MyTeams screen at index 1 only for SM role
+    // if (userRole.value == "SM") {
+    //   baseScreens.insert(1, const MyTeams());
+    // }
+
+    // Insert MyTeams screen only for SM role
     if (userRole.value == "SM") {
       baseScreens.insert(1, const MyTeams());
+      baseScreens.insert(2, CalendarSm(leadName: ''));
+    } else {
+      // Regular calendar screen for other roles
+      baseScreens.add(CalendarWithTimeline(leadName: ''));
     }
 
     return baseScreens;

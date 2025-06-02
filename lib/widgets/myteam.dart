@@ -136,7 +136,7 @@ class _MyteamState extends State<Myteam> {
     return gradients[index % gradients.length];
   }
 
-// Update this method to handle different period filters in API request
+  // Update this method to handle different period filters in API request
   Future<Map<String, dynamic>> fetchTeamComparisonData() async {
     try {
       setState(() {
@@ -171,12 +171,16 @@ class _MyteamState extends State<Myteam> {
       }
 
       Uri url = Uri.parse(
-          'https://dev.smartassistapp.in/api/users/sm/dashboard/team-comparison$periodParam');
+        'https://dev.smartassistapp.in/api/users/sm/dashboard/team-comparison$periodParam',
+      );
 
-      final response = await http.get(url, headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      });
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
       print('Request URL: ${url.toString()}');
       print(url.toString());
       if (response.statusCode == 200) {
@@ -197,7 +201,7 @@ class _MyteamState extends State<Myteam> {
     }
   }
 
-// First, add a method to fetch the All performance data
+  // First, add a method to fetch the All performance data
   Future<void> _fetchAllTeamPerformance() async {
     try {
       setState(() {
@@ -207,7 +211,8 @@ class _MyteamState extends State<Myteam> {
       final token = await Storage.getToken();
       final response = await http.get(
         Uri.parse(
-            'https://dev.smartassistapp.in/api/users/sm/dashboard/all-performance'),
+          'https://dev.smartassistapp.in/api/users/sm/dashboard/all-performance',
+        ),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -246,7 +251,8 @@ class _MyteamState extends State<Myteam> {
       final token = await Storage.getToken();
       final response = await http.get(
         Uri.parse(
-            'https://dev.smartassistapp.in/api/users/sm/dashboard/individual-performance'),
+          'https://dev.smartassistapp.in/api/users/sm/dashboard/individual-performance',
+        ),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -271,14 +277,11 @@ class _MyteamState extends State<Myteam> {
           }
         }
 
-        return {
-          'status': 200,
-          'teamProfiles': teamProfiles,
-        };
+        return {'status': 200, 'teamProfiles': teamProfiles};
       } else {
         return {
           'status': response.statusCode,
-          'message': 'Failed to load data'
+          'message': 'Failed to load data',
         };
       }
     } catch (e) {
@@ -292,7 +295,7 @@ class _MyteamState extends State<Myteam> {
       );
       return {
         'status': 500,
-        'message': 'An error occurred while fetching data'
+        'message': 'An error occurred while fetching data',
       };
     }
   }
@@ -302,7 +305,8 @@ class _MyteamState extends State<Myteam> {
       final token = await Storage.getToken();
       final response = await http.get(
         Uri.parse(
-            'https://dev.smartassistapp.in/api/users/sm/dashboard/individual-performance?user_id=$userId'),
+          'https://dev.smartassistapp.in/api/users/sm/dashboard/individual-performance?user_id=$userId',
+        ),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -319,11 +323,14 @@ class _MyteamState extends State<Myteam> {
 
           // Also extract upcoming activities for use in UI
           _upcomingFollowups = List<Map<String, dynamic>>.from(
-              _individualPerformanceData['stats']['UpComingFollowups'] ?? []);
+            _individualPerformanceData['stats']['UpComingFollowups'] ?? [],
+          );
           _upcomingAppointments = List<Map<String, dynamic>>.from(
-              _individualPerformanceData['stats']['UpComingAppointment'] ?? []);
+            _individualPerformanceData['stats']['UpComingAppointment'] ?? [],
+          );
           _upcomingTestDrives = List<Map<String, dynamic>>.from(
-              _individualPerformanceData['stats']['UpComingTestDrive'] ?? []);
+            _individualPerformanceData['stats']['UpComingTestDrive'] ?? [],
+          );
         });
       } else {
         throw Exception('Failed to load individual performance data');
@@ -338,9 +345,11 @@ class _MyteamState extends State<Myteam> {
     }
   }
 
-// Individual Performance View
+  // Individual Performance View
   Widget _buildIndividualPerformanceView(
-      BuildContext context, double screenWidth) {
+    BuildContext context,
+    double screenWidth,
+  ) {
     // Determine which data to use based on selection
     Map<String, dynamic> performanceData;
     Map<String, dynamic> stats;
@@ -499,7 +508,8 @@ class _MyteamState extends State<Myteam> {
               _selectedProfileIndex = index;
               _selectedUserId = userId; // Store the selected user_id
               _fetchIndividualPerformance(
-                  userId); // Call the API with the new user_id
+                userId,
+              ); // Call the API with the new user_id
               _selectedType = 'dynamic';
             });
           },
@@ -515,19 +525,12 @@ class _MyteamState extends State<Myteam> {
                   : null,
             ),
             child: Center(
-              child: Icon(
-                Icons.person,
-                color: Colors.grey.shade400,
-                size: 32,
-              ),
+              child: Icon(Icons.person, color: Colors.grey.shade400, size: 32),
             ),
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          firstName,
-          style: AppFont.mediumText14(context),
-        ),
+        Text(firstName, style: AppFont.mediumText14(context)),
         // Text(
         //   lastName,
         //   style: AppFont.mediumText14(context),
@@ -571,7 +574,9 @@ class _MyteamState extends State<Myteam> {
   }
 
   Widget _buildActivitySection(
-      BuildContext context, List<Map<String, dynamic>> activities) {
+    BuildContext context,
+    List<Map<String, dynamic>> activities,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -585,8 +590,9 @@ class _MyteamState extends State<Myteam> {
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
               child: Container(
                 decoration: BoxDecoration(
-                    color: AppColors.containerBg,
-                    borderRadius: BorderRadius.circular(5)),
+                  color: AppColors.containerBg,
+                  borderRadius: BorderRadius.circular(5),
+                ),
                 child: _buildFollowupCard(
                   context,
                   name: activity['name'] ?? '',
@@ -660,7 +666,8 @@ class _MyteamState extends State<Myteam> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => FollowupsDetails(leadId: leadId)),
+                    builder: (context) => FollowupsDetails(leadId: leadId),
+                  ),
                 );
               } else {
                 print("Invalid leadId");
@@ -669,10 +676,14 @@ class _MyteamState extends State<Myteam> {
             child: Container(
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
-                  color: AppColors.arrowContainerColor,
-                  borderRadius: BorderRadius.circular(30)),
-              child: const Icon(Icons.arrow_forward_ios_rounded,
-                  size: 25, color: Colors.white),
+                color: AppColors.arrowContainerColor,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 25,
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -732,7 +743,8 @@ class _MyteamState extends State<Myteam> {
       height: height,
       width: 0.1,
       decoration: const BoxDecoration(
-          border: Border(right: BorderSide(color: AppColors.fontColor))),
+        border: Border(right: BorderSide(color: AppColors.fontColor)),
+      ),
     );
   }
 
@@ -755,7 +767,7 @@ class _MyteamState extends State<Myteam> {
           {'name': 'Andrew Smith', 'count': 35, 'id': 'andrew_smith'},
           {'name': 'Michael Torres', 'count': 25, 'id': 'michael_torres'},
           {'name': 'Sam Peters', 'count': 65, 'id': 'sam_peters'},
-        ]
+        ],
       },
       {
         'name': 'Anand',
@@ -766,7 +778,7 @@ class _MyteamState extends State<Myteam> {
           {'name': 'Angela Davis', 'count': 15, 'id': 'angela_davis'},
           {'name': 'Mark Singer', 'count': 60, 'id': 'mark_singer'},
           {'name': 'Sarah Johnson', 'count': 45, 'id': 'sarah_johnson'},
-        ]
+        ],
       },
       {
         'name': 'Kenem',
@@ -777,7 +789,7 @@ class _MyteamState extends State<Myteam> {
           {'name': 'James Wilson', 'count': 30, 'id': 'james_wilson'},
           {'name': 'Emma Taylor', 'count': 70, 'id': 'emma_taylor'},
           {'name': 'David Lopez', 'count': 40, 'id': 'david_lopez'},
-        ]
+        ],
       },
       {
         'name': 'sikos',
@@ -788,8 +800,8 @@ class _MyteamState extends State<Myteam> {
           {'name': 'James Wilson', 'count': 30, 'id': 'james_wilson'},
           {'name': 'Emma Taylor', 'count': 70, 'id': 'emma_taylor'},
           {'name': 'David Lopez', 'count': 40, 'id': 'david_lopez'},
-        ]
-      }
+        ],
+      },
     ];
   }
 
@@ -883,12 +895,14 @@ class _MyteamState extends State<Myteam> {
       // Fetch team performance data for all users first
       await _fetchAllTeamPerformance();
 
-      _fetchDataUserProfile().then((data) {
-        // Update any fields based on user profile data
-        print('User profile fetched successfully');
-      }).catchError((e) {
-        print('Error fetching user profile: $e');
-      });
+      _fetchDataUserProfile()
+          .then((data) {
+            // Update any fields based on user profile data
+            print('User profile fetched successfully');
+          })
+          .catchError((e) {
+            print('Error fetching user profile: $e');
+          });
 
       print("Team comparison data fetched successfully");
     } catch (error) {
@@ -914,7 +928,8 @@ class _MyteamState extends State<Myteam> {
   }
 
   List<Map<String, dynamic>> processDataForDisplay(
-      Map<String, dynamic> responseData) {
+    Map<String, dynamic> responseData,
+  ) {
     List<Map<String, dynamic>> result = [];
 
     // Add independent user if present
@@ -924,7 +939,7 @@ class _MyteamState extends State<Myteam> {
         result.add({
           'name': user['name'] ?? 'Unknown',
           'count': _getMetricValueForUser(user),
-          'type': 'user'
+          'type': 'user',
         });
       }
     }
@@ -938,7 +953,7 @@ class _MyteamState extends State<Myteam> {
           result.add({
             'name': team['team_name'] ?? 'Unnamed Team',
             'count': _calculateTeamTotal(team),
-            'type': 'team'
+            'type': 'team',
           });
 
           // Add team members if present
@@ -950,7 +965,7 @@ class _MyteamState extends State<Myteam> {
               result.add({
                 'name': member['name'] ?? 'Unknown Member',
                 'count': _getMetricValueForUser(member),
-                'type': 'member'
+                'type': 'member',
               });
             }
           }
@@ -960,7 +975,7 @@ class _MyteamState extends State<Myteam> {
 
     return result;
   }
-//uncommment
+  //uncommment
   // int findMaxValue(List<Map<String, dynamic>> items) {
   //   int max = 0;
   //   for (var item in items) {
@@ -984,229 +999,236 @@ class _MyteamState extends State<Myteam> {
         backgroundColor: Colors.blue,
         title: Text('My team', style: AppFont.appbarfontWhite(context)),
       ),
-      body: Stack(children: [
-        Scaffold(
-          body: SingleChildScrollView(
-            child: Container(
-              color: Colors.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Tab selection buttons
-                  // _buildTabButtons(),
+      body: Stack(
+        children: [
+          Scaffold(
+            body: SingleChildScrollView(
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tab selection buttons
+                    // _buildTabButtons(),
 
-                  // If _tabIndex != 0, show nothing (empty SizedBox)
+                    // If _tabIndex != 0, show nothing (empty SizedBox)
 
-                  // Profile avatars (only show for Individual Performance tab)
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        if (_tabIndex == 0) ...[
-                          _buildProfileAvatarStaticsAll(
-                            'All',
-                            0,
-                          ),
-                          _buildProfileAvatars(),
-                        ]
-                      ],
+                    // Profile avatars (only show for Individual Performance tab)
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          if (_tabIndex == 0) ...[
+                            _buildProfileAvatarStaticsAll('All', 0),
+                            _buildProfileAvatars(),
+                          ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  // Period filter and date selection
+                    // Period filter and date selection
 
-                  // Start of your widget
-                  Column(
-                    children: [
-                      // Period Filter and Individual/Team view with condition
-
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.backgroundLightGrey,
-                                borderRadius: BorderRadius.circular(5),
+                    // Start of your widget
+                    Column(
+                      children: [
+                        // Period Filter and Individual/Team view with condition
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          child: Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.backgroundLightGrey,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Column(
+                                  children: [
+                                    _comparisionButtons(screenWidth),
+                                    _buildIndividualPerformanceView(
+                                      context,
+                                      screenWidth,
+                                    ),
+                                    // _buildFollowupCard(context),
+                                  ],
+                                ),
                               ),
-                              child: Column(
-                                children: [
-                                  _comparisionButtons(screenWidth),
-                                  _buildIndividualPerformanceView(
-                                      context, screenWidth),
-                                  // _buildFollowupCard(context),
+                              const SizedBox(height: 10),
+
+                              if (_selectedType != 'All') ...[
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.backgroundLightGrey,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                              left: 10,
+                                              bottom: 0,
+                                            ),
+                                            child: Text(
+                                              'Activities',
+                                              style: AppFont.dropDowmLabel(
+                                                context,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isHideActivities =
+                                                    !isHideActivities;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              isHideActivities
+                                                  ? Icons
+                                                        .keyboard_arrow_down_rounded
+                                                  : Icons
+                                                        .keyboard_arrow_up_rounded,
+                                              size: 35,
+                                              color: AppColors.iconGrey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!isHideActivities) ...[
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.backgroundLightGrey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    margin: const EdgeInsets.only(top: 10),
+                                    child: _buildUpcomingActivities(context),
+                                  ),
                                 ],
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-
-                            if (_selectedType != 'All') ...[
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.backgroundLightGrey,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 10, bottom: 0),
-                                          child: Text(
-                                            'Activities',
-                                            style:
-                                                AppFont.dropDowmLabel(context),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isHideActivities =
-                                                  !isHideActivities;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            isHideActivities
-                                                ? Icons
-                                                    .keyboard_arrow_down_rounded
-                                                : Icons
-                                                    .keyboard_arrow_up_rounded,
-                                            size: 35,
-                                            color: AppColors.iconGrey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (!isHideActivities) ...[
+                                const SizedBox(height: 10),
                                 Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.backgroundLightGrey,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                              left: 10,
+                                              bottom: 0,
+                                            ),
+                                            child: Text(
+                                              'Call Analysis',
+                                              style: AppFont.dropDowmLabel(
+                                                context,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isHideCalls = !isHideCalls;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              isHideCalls
+                                                  ? Icons
+                                                        .keyboard_arrow_down_rounded
+                                                  : Icons
+                                                        .keyboard_arrow_up_rounded,
+                                              size: 35,
+                                              color: AppColors.iconGrey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!isHideCalls) ...[
+                                  Container(
                                     decoration: BoxDecoration(
-                                        color: AppColors.backgroundLightGrey,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
+                                      color: AppColors.backgroundLightGrey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                     margin: const EdgeInsets.only(top: 10),
-                                    child: _buildUpcomingActivities(context)),
+                                    child: _callLogsWidget(context),
+                                  ),
+                                ],
                               ],
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.backgroundLightGrey,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 10, bottom: 0),
-                                          child: Text(
-                                            'Call Analysis',
-                                            style:
-                                                AppFont.dropDowmLabel(context),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isHideCalls = !isHideCalls;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            isHideCalls
-                                                ? Icons
-                                                    .keyboard_arrow_down_rounded
-                                                : Icons
-                                                    .keyboard_arrow_up_rounded,
-                                            size: 35,
-                                            color: AppColors.iconGrey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (!isHideCalls) ...[
-                                Container(
-                                    decoration: BoxDecoration(
-                                        color: AppColors.backgroundLightGrey,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    margin: const EdgeInsets.only(top: 10),
-                                    child: _callLogsWidget(context)),
-                              ],
-                            ],
 
-                            const SizedBox(
-                              height: 10,
-                            ),
+                              const SizedBox(height: 10),
 
-                            if (_selectedType != 'dynamic') ...[
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.backgroundLightGrey,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 10, bottom: 0),
-                                          child: Text(
-                                            'Team Comparison',
-                                            style:
-                                                AppFont.dropDowmLabel(context),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isHide = !isHide;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            isHide
-                                                ? Icons
-                                                    .keyboard_arrow_down_rounded
-                                                : Icons
-                                                    .keyboard_arrow_up_rounded,
-                                            size: 35,
-                                            color: AppColors.iconGrey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (!isHide) ...[
+                              if (_selectedType != 'dynamic') ...[
                                 Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.backgroundLightGrey,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                              left: 10,
+                                              bottom: 0,
+                                            ),
+                                            child: Text(
+                                              'Team Comparison',
+                                              style: AppFont.dropDowmLabel(
+                                                context,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isHide = !isHide;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              isHide
+                                                  ? Icons
+                                                        .keyboard_arrow_down_rounded
+                                                  : Icons
+                                                        .keyboard_arrow_up_rounded,
+                                              size: 35,
+                                              color: AppColors.iconGrey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!isHide) ...[
+                                  Container(
                                     decoration: BoxDecoration(
-                                        color: AppColors.backgroundLightGrey,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
+                                      color: AppColors.backgroundLightGrey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                     margin: const EdgeInsets.only(top: 10),
                                     child: Column(
                                       crossAxisAlignment:
@@ -1221,8 +1243,9 @@ class _MyteamState extends State<Myteam> {
                                             if (selectedTeams.isNotEmpty &&
                                                 !showAll)
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.all(12.0),
+                                                padding: const EdgeInsets.all(
+                                                  12.0,
+                                                ),
                                                 child: ElevatedButton(
                                                   onPressed: () {
                                                     setState(() {
@@ -1231,25 +1254,27 @@ class _MyteamState extends State<Myteam> {
                                                   },
                                                   style:
                                                       ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.blue,
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                  ),
+                                                        backgroundColor:
+                                                            Colors.blue,
+                                                        foregroundColor:
+                                                            Colors.white,
+                                                      ),
                                                   child: const Text("Show All"),
                                                 ),
                                               ),
                                             const Padding(
                                               padding: EdgeInsets.only(
-                                                  top: 10,
-                                                  right: 8.0,
-                                                  bottom: 10.0),
+                                                top: 10,
+                                                right: 8.0,
+                                                bottom: 10.0,
+                                              ),
                                               child: Align(
                                                 alignment:
                                                     Alignment.centerRight,
                                                 child: Padding(
                                                   padding: EdgeInsets.symmetric(
-                                                      horizontal: 10.0),
+                                                    horizontal: 10.0,
+                                                  ),
                                                   child: Text(
                                                     "Target",
                                                     style: TextStyle(
@@ -1278,15 +1303,15 @@ class _MyteamState extends State<Myteam> {
                                             final isTeam =
                                                 item['type'] == 'team';
                                             final teamId = item['id'] ?? '';
-                                            final isSelected =
-                                                selectedTeams.contains(teamId);
+                                            final isSelected = selectedTeams
+                                                .contains(teamId);
 
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                vertical: 8.0,
-                                                horizontal: 10,
-                                              ),
+                                                    vertical: 8.0,
+                                                    horizontal: 10,
+                                                  ),
                                               child: Row(
                                                 children: [
                                                   // Checkbox (only for team headers)
@@ -1295,7 +1320,8 @@ class _MyteamState extends State<Myteam> {
                                                       value: isSelected,
                                                       onChanged: (bool? value) {
                                                         toggleTeamSelection(
-                                                            teamId);
+                                                          teamId,
+                                                        );
                                                       },
                                                       visualDensity:
                                                           VisualDensity.compact,
@@ -1311,7 +1337,7 @@ class _MyteamState extends State<Myteam> {
                                                       style: TextStyle(
                                                         fontWeight: isTeam
                                                             ? FontWeight
-                                                                .normal // Changed from bold to normal
+                                                                  .normal // Changed from bold to normal
                                                             : FontWeight.normal,
                                                         fontSize: 14,
                                                         color: Colors.black87,
@@ -1323,25 +1349,29 @@ class _MyteamState extends State<Myteam> {
 
                                                   // Progress bar
                                                   Expanded(
-                                                    child:
-                                                        LinearPercentIndicator(
+                                                    child: LinearPercentIndicator(
                                                       percent: percentage.clamp(
-                                                          0.0, 1.0),
+                                                        0.0,
+                                                        1.0,
+                                                      ),
                                                       lineHeight: 20.0,
                                                       barRadius:
                                                           const Radius.circular(
-                                                              10),
+                                                            10,
+                                                          ),
                                                       backgroundColor:
                                                           Colors.grey[200],
                                                       linearGradient:
                                                           LinearGradient(
-                                                        colors:
-                                                            _getGradientForIndex(
-                                                                index),
-                                                      ),
+                                                            colors:
+                                                                _getGradientForIndex(
+                                                                  index,
+                                                                ),
+                                                          ),
                                                       padding:
                                                           const EdgeInsets.only(
-                                                              right: 10),
+                                                            right: 10,
+                                                          ),
                                                     ),
                                                   ),
 
@@ -1360,77 +1390,84 @@ class _MyteamState extends State<Myteam> {
                                           },
                                         ),
                                       ],
-                                    ))
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
-// thir code for first button
-                            FutureBuilder<Map<String, dynamic>>(
-                              future: _data,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return const Center(
-                                      child: Text('Error loading data'));
-                                } else if (snapshot.hasData) {
-                                  var data = snapshot.data!;
+                              // thir code for first button
+                              FutureBuilder<Map<String, dynamic>>(
+                                future: _data,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    return const Center(
+                                      child: Text('Error loading data'),
+                                    );
+                                  } else if (snapshot.hasData) {
+                                    var data = snapshot.data!;
 
-                                  if (data.containsKey('teamProfiles')) {
-                                    // Use the teamProfiles fetched from the API
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: List.generate(
-                                          data['teamProfiles'].length,
-                                          (index) => _buildProfileAvatar(
-                                            data['teamProfiles'][index]['name'],
-                                            // data['teamProfiles'][index]
-                                            //     ['lastName'],
-                                            index,
-                                            data['teamProfiles'][index]
-                                                ['user_id'],
+                                    if (data.containsKey('teamProfiles')) {
+                                      // Use the teamProfiles fetched from the API
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: List.generate(
+                                            data['teamProfiles'].length,
+                                            (index) => _buildProfileAvatar(
+                                              data['teamProfiles'][index]['name'],
+                                              // data['teamProfiles'][index]
+                                              //     ['lastName'],
+                                              index,
+                                              data['teamProfiles'][index]['user_id'],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      return Center(child: Text(''));
+                                    }
                                   } else {
-                                    return Center(child: Text(''));
+                                    return Center(
+                                      child: Text('No data available'),
+                                    );
                                   }
-                                } else {
-                                  return Center(
-                                      child: Text('No data available'));
-                                }
-                              },
-                            ),
-                          ],
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      )
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
 
-        Positioned(
-          bottom: 5,
-          right: 16,
-          child: _buildFloatingActionButton(context),
-        ),
+          Positioned(
+            bottom: 5,
+            right: 16,
+            child: _buildFloatingActionButton(context),
+          ),
 
-        // Popup Menu (Conditionally Rendered)
-        Obx(() => fabController.isFabExpanded.value
-            ? _buildPopupMenu(context)
-            : const SizedBox.shrink()),
-      ]),
+          // Popup Menu (Conditionally Rendered)
+          Obx(
+            () => fabController.isFabExpanded.value
+                ? _buildPopupMenu(context)
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1476,36 +1513,41 @@ class _MyteamState extends State<Myteam> {
           _buildRow('All Calls', _callLogs['all'] ?? 0, '', Icons.call),
 
           // Outgoing Calls
-          _buildRow('Outgoing Calls', _callLogs['outgoing'] ?? 0, 'outgoing',
-              Icons.phone_forwarded_outlined),
+          _buildRow(
+            'Outgoing Calls',
+            _callLogs['outgoing'] ?? 0,
+            'outgoing',
+            Icons.phone_forwarded_outlined,
+          ),
 
           // Incoming Calls
-          _buildRow('Incoming Calls', _callLogs['incoming'] ?? 0, 'incoming',
-              Icons.call),
+          _buildRow(
+            'Incoming Calls',
+            _callLogs['incoming'] ?? 0,
+            'incoming',
+            Icons.call,
+          ),
 
           // Missed Calls
-          _buildRow('Missed Calls', _callLogs['missed'] ?? 0, 'missed',
-              Icons.call_missed),
+          _buildRow(
+            'Missed Calls',
+            _callLogs['missed'] ?? 0,
+            'missed',
+            Icons.call_missed,
+          ),
         ],
       ),
     );
   }
 
-// Helper method to build each row with dynamic values
+  // Helper method to build each row with dynamic values
   Widget _buildRow(String title, int count, String category, IconData icon) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Icon(
-          icon,
-          size: 25,
-          color: _getIconColor(category),
-        ),
+        Icon(icon, size: 25, color: _getIconColor(category)),
         SizedBox(width: MediaQuery.of(context).size.width * 0.1),
-        Text(
-          title,
-          style: AppFont.dropDowmLabel(context),
-        ),
+        Text(title, style: AppFont.dropDowmLabel(context)),
         Expanded(child: Container()),
         Text(
           '$count', // Use dynamic value
@@ -1516,10 +1558,8 @@ class _MyteamState extends State<Myteam> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CallHistory(
-                  category: category,
-                  mobile: '',
-                ),
+                builder: (context) =>
+                    CallHistory(category: category, mobile: ''),
               ),
             );
           },
@@ -1533,7 +1573,7 @@ class _MyteamState extends State<Myteam> {
     );
   }
 
-// Helper method to get icon color based on category
+  // Helper method to get icon color based on category
   Color _getIconColor(String category) {
     switch (category) {
       case 'outgoing':
@@ -1557,9 +1597,7 @@ class _MyteamState extends State<Myteam> {
         children: [
           // Background overlay
           Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.7),
-            ),
+            child: Container(color: Colors.black.withOpacity(0.7)),
           ),
 
           // Popup Items Container aligned bottom right
@@ -1572,15 +1610,24 @@ class _MyteamState extends State<Myteam> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  _buildPopupItem(Icons.people, "Create New Team", -40,
-                      onTap: () {
-                    fabController.closeFab();
-                    // _showFollowupPopup(context, widget.leadId);
-                  }),
-                  _buildPopupItem(Icons.person, "Create User", -80, onTap: () {
-                    fabController.closeFab();
-                    // _showAppointmentPopup(context, widget.leadId);
-                  }),
+                  _buildPopupItem(
+                    Icons.people,
+                    "Create New Team",
+                    -40,
+                    onTap: () {
+                      fabController.closeFab();
+                      // _showFollowupPopup(context, widget.leadId);
+                    },
+                  ),
+                  _buildPopupItem(
+                    Icons.person,
+                    "Create User",
+                    -80,
+                    onTap: () {
+                      fabController.closeFab();
+                      // _showAppointmentPopup(context, widget.leadId);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1598,51 +1645,59 @@ class _MyteamState extends State<Myteam> {
   }
 
   // Popup Item Builder
-  Widget _buildPopupItem(IconData icon, String label, double offsetY,
-      {required Function() onTap}) {
-    return Obx(() => TweenAnimationBuilder(
-          tween: Tween<double>(
-              begin: 0, end: fabController.isFabExpanded.value ? 1 : 0),
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutBack,
-          builder: (context, double value, child) {
-            return Transform.translate(
-              offset: Offset(0, offsetY * (1 - value)),
-              child: Opacity(
-                opacity: value.clamp(0.0, 1.0),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        label,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
+  Widget _buildPopupItem(
+    IconData icon,
+    String label,
+    double offsetY, {
+    required Function() onTap,
+  }) {
+    return Obx(
+      () => TweenAnimationBuilder(
+        tween: Tween<double>(
+          begin: 0,
+          end: fabController.isFabExpanded.value ? 1 : 0,
+        ),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutBack,
+        builder: (context, double value, child) {
+          return Transform.translate(
+            offset: Offset(0, offsetY * (1 - value)),
+            child: Opacity(
+              opacity: value.clamp(0.0, 1.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
                       ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: onTap,
-                        behavior: HitTestBehavior.opaque,
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.colorsBlue,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Icon(icon, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: onTap,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.colorsBlue,
+                          borderRadius: BorderRadius.circular(30),
                         ),
+                        child: Icon(icon, color: Colors.white, size: 24),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ));
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildProfileAvatars() {
@@ -1688,10 +1743,7 @@ class _MyteamState extends State<Myteam> {
     );
   }
 
-  Widget _buildProfileAvatarStaticsAll(
-    String firstName,
-    int index,
-  ) {
+  Widget _buildProfileAvatarStaticsAll(String firstName, int index) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1715,19 +1767,12 @@ class _MyteamState extends State<Myteam> {
                   : null,
             ),
             child: Center(
-              child: Icon(
-                Icons.person,
-                color: Colors.grey.shade400,
-                size: 32,
-              ),
+              child: Icon(Icons.person, color: Colors.grey.shade400, size: 32),
             ),
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          'All',
-          style: AppFont.mediumText14(context),
-        ),
+        Text('All', style: AppFont.mediumText14(context)),
         // Text(
         //   lastName,
         //   style: AppFont.mediumText14(context),
@@ -1736,7 +1781,7 @@ class _MyteamState extends State<Myteam> {
     );
   }
 
-// Individual period button for comparison tab
+  // Individual period button for comparison tab
   Widget _buildPeriodButtonForComparison(String label, int index) {
     return InkWell(
       onTap: () {
@@ -1749,7 +1794,8 @@ class _MyteamState extends State<Myteam> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
         decoration: BoxDecoration(
           border: Border.all(
-              color: _periodIndex == index ? Colors.blue : Colors.transparent),
+            color: _periodIndex == index ? Colors.blue : Colors.transparent,
+          ),
           // color: _periodIndex == index ? Colors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
         ),
@@ -1792,9 +1838,7 @@ class _MyteamState extends State<Myteam> {
           Container(
             height: 40,
             width: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
             child: IconButton(
               icon: const Icon(Icons.calendar_today, size: 20),
               onPressed: () {
@@ -1855,10 +1899,7 @@ class _MyteamState extends State<Myteam> {
                 label,
                 maxLines: 3,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: textColor,
-                ),
+                style: GoogleFonts.poppins(fontSize: 14, color: textColor),
               ),
             ),
           ],
@@ -1930,12 +1971,13 @@ class FlexibleButton extends StatelessWidget {
   final BoxDecoration decoration;
   final TextStyle textStyle;
 
-  const FlexibleButton(
-      {super.key,
-      required this.title,
-      required this.onPressed,
-      required this.decoration,
-      required this.textStyle});
+  const FlexibleButton({
+    super.key,
+    required this.title,
+    required this.onPressed,
+    required this.decoration,
+    required this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1946,18 +1988,12 @@ class FlexibleButton extends StatelessWidget {
       child: TextButton(
         style: TextButton.styleFrom(
           backgroundColor: const Color(0xffF3F9FF),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           minimumSize: const Size(0, 0),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         onPressed: onPressed,
-        child: Text(
-          title,
-          style: textStyle,
-          textAlign: TextAlign.center,
-        ),
+        child: Text(title, style: textStyle, textAlign: TextAlign.center),
       ),
     );
   }

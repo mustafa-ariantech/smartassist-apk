@@ -408,7 +408,7 @@ class LeadsSrv {
 
     try {
       final response = await http.post(
-        Uri.parse('${baseUrl}admin/records/$leadId/events/create-appointment'),
+        Uri.parse('${baseUrl}admin/records/$leadId/tasks/create-appointment'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

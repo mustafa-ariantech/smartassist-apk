@@ -298,6 +298,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:smartassist/config/component/color/colors.dart';
+import 'package:smartassist/config/component/font/font.dart';
 import 'package:smartassist/utils/bottom_navigation.dart';
 import 'package:smartassist/utils/storage.dart';
 import 'package:smartassist/widgets/followups/all_followups.dart';
@@ -322,6 +323,8 @@ class _AddFollowupsState extends State<AddFollowups> {
   List<dynamic> _filteredUpcomingTasks = [];
   List<dynamic> _filteredOverdueTasks = [];
   int _upcommingButtonIndex = 0;
+  int count = 0;
+
   TextEditingController searchController = TextEditingController();
   bool _isLoading = true;
 
@@ -348,11 +351,13 @@ class _AddFollowupsState extends State<AddFollowups> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         setState(() {
+          count = data['data']['overdueWeekTasks']?['count'] ?? 0;
           _originalAllTasks = data['data']['allTasks']?['rows'] ?? [];
           _originalUpcomingTasks =
               data['data']['upcomingWeekTasks']?['rows'] ?? [];
           _originalOverdueTasks =
               data['data']['overdueWeekTasks']?['rows'] ?? [];
+
           _filteredAllTasks = List.from(_originalAllTasks);
           _filteredUpcomingTasks = List.from(_originalUpcomingTasks);
           _filteredOverdueTasks = List.from(_originalOverdueTasks);
@@ -497,34 +502,26 @@ class _AddFollowupsState extends State<AddFollowups> {
                           child: Row(
                             children: [
                               _buildFilterButton(
+                                color: AppColors.colorsBlue,
                                 index: 0,
                                 text: 'All',
-                                activeColor: const Color.fromARGB(
-                                  255,
-                                  159,
-                                  174,
-                                  239,
+                                activeColor: AppColors.colorsBlue.withOpacity(
+                                  0.2,
                                 ),
                               ),
                               _buildFilterButton(
+                                color: AppColors.sideGreen,
                                 index: 1,
                                 text: 'Upcoming',
-                                activeColor: const Color.fromARGB(
-                                  255,
-                                  81,
-                                  223,
-                                  121,
+                                activeColor: AppColors.sideGreen.withOpacity(
+                                  0.2,
                                 ),
                               ),
                               _buildFilterButton(
+                                color: AppColors.sideRed,
                                 index: 2,
-                                text: 'Overdue',
-                                activeColor: const Color.fromRGBO(
-                                  238,
-                                  59,
-                                  59,
-                                  1,
-                                ),
+                                text: 'Overdue ($count)',
+                                activeColor: AppColors.sideRed.withOpacity(0.2),
                               ),
                             ],
                           ),
@@ -596,22 +593,19 @@ class _AddFollowupsState extends State<AddFollowups> {
     required int index,
     required String text,
     required Color activeColor,
+    required Color color,
   }) {
+    final bool isActive = _upcommingButtonIndex == index;
+
     return Expanded(
       child: TextButton(
         onPressed: () => setState(() => _upcommingButtonIndex = index),
         style: TextButton.styleFrom(
-          backgroundColor: _upcommingButtonIndex == index
-              ? activeColor.withOpacity(0.29)
-              : null,
-          foregroundColor: _upcommingButtonIndex == index
-              ? Colors.blueGrey
-              : Colors.black,
-          padding: const EdgeInsets.symmetric(vertical: 5),
+          backgroundColor: isActive ? activeColor.withOpacity(0.29) : null,
+          foregroundColor: isActive ? Colors.blueGrey : Colors.black,
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
           side: BorderSide(
-            color: _upcommingButtonIndex == index
-                ? activeColor
-                : Colors.transparent,
+            color: isActive ? activeColor : Colors.transparent,
             width: .5,
           ),
           shape: RoundedRectangleBorder(
@@ -620,10 +614,10 @@ class _AddFollowupsState extends State<AddFollowups> {
         ),
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 12,
+          style: TextStyle(
+            fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: Colors.grey,
+            color: isActive ? color : Colors.grey,
           ),
         ),
       ),

@@ -10,6 +10,7 @@ import 'package:smartassist/utils/storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartassist/services/leads_srv.dart';
 import 'package:smartassist/utils/snackbar_helper.dart';
+import 'package:smartassist/widgets/popups_widget/vehicleSearch_textfield.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class TestdriveIds extends StatefulWidget {
@@ -26,12 +27,15 @@ class TestdriveIds extends StatefulWidget {
 }
 
 class _TestdriveIdsState extends State<TestdriveIds> {
+  String? selectedVehicleName;
+  String? selectedBrand;
+  Map<String, dynamic>? selectedVehicleData;
   // final PageController _pageController = PageController();
   List<Map<String, String>> dropdownItems = [];
   bool isLoading = false;
   List<dynamic> vehicleList = [];
   List<String> uniqueVehicleNames = [];
-  String? selectedVehicleName;
+  // String? selectedVehicleName;
   bool _isLoadingSearch = false;
   String _query = '';
   String? selectedLeads;
@@ -442,7 +446,20 @@ class _TestdriveIdsState extends State<TestdriveIds> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // _buildSearchField(),
-              _buildSearchField1(),
+              // _buildSearchField1(),
+              VehiclesearchTextfield(
+                onVehicleSelected: (selectedVehicle) {
+                  setState(() {
+                    selectedVehicleData = selectedVehicle;
+                    selectedVehicleName = selectedVehicle['vehicle_name'];
+                    selectedBrand =
+                        selectedVehicle['brand'] ?? ''; // Handle null brand
+                  });
+
+                  print("Selected Vehicle: $selectedVehicleName");
+                  print("Selected Brand: ${selectedBrand ?? 'No Brand'}");
+                },
+              ),
               const SizedBox(height: 15),
               Row(
                 children: [
@@ -465,7 +482,7 @@ class _TestdriveIdsState extends State<TestdriveIds> {
               ),
               const SizedBox(height: 10),
               _buildTextField(
-                label: 'Comments:',
+                label: 'Remarks:',
                 controller: descriptionController,
                 hint: 'Add Comments',
               ),
@@ -943,7 +960,7 @@ class _TestdriveIdsState extends State<TestdriveIds> {
       'end_date': formattedEndDate,
       'start_time': formattedStartTime,
       'end_time': formattedEndTime,
-      'comments': descriptionController.text,
+      'remarks': descriptionController.text,
       'sp_id': spId,
     };
 

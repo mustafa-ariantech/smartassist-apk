@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smartassist/config/component/color/colors.dart'; 
+import 'package:smartassist/config/component/color/colors.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -39,11 +39,7 @@ class WhatsappChat extends StatefulWidget {
   final String chatId;
   final String userName;
 
-  const WhatsappChat({
-    super.key,
-    required this.chatId,
-    required this.userName,
-  });
+  const WhatsappChat({super.key, required this.chatId, required this.userName});
 
   @override
   State<WhatsappChat> createState() => _WhatsappChatState();
@@ -101,20 +97,14 @@ class MessageBubble extends StatelessWidget {
                 ),
               ),
             if (message.body.isNotEmpty)
-              Text(
-                message.body,
-                style: const TextStyle(fontSize: 16),
-              ),
+              Text(message.body, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 2),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   timeString,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                 ),
                 if (message.fromMe) const SizedBox(width: 3),
                 if (message.fromMe)
@@ -147,8 +137,9 @@ class _WhatsappChatState extends State<WhatsappChat> {
   }
 
   String formatTimestamp(int timestamp) {
-    final DateTime dateTime =
-        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+    final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+      timestamp * 1000,
+    );
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
@@ -423,8 +414,10 @@ class _WhatsappChatState extends State<WhatsappChat> {
         backgroundColor: AppColors.colorsBlue,
         leadingWidth: 40,
         leading: IconButton(
-          icon:
-              const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+          ),
           // onPressed: () => Navigator.pop(context),
           onPressed: () {
             disconnectSocket();
@@ -466,9 +459,9 @@ class _WhatsappChatState extends State<WhatsappChat> {
               if (!isConnected) {
                 // Try to reconnect if disconnected
                 socket.connect();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Reconnecting...')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Reconnecting...')));
               }
             },
           ),
@@ -500,17 +493,20 @@ class _WhatsappChatState extends State<WhatsappChat> {
                 : ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                      vertical: 10,
+                      horizontal: 10,
+                    ),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final showDate = index == 0 ||
+                      final showDate =
+                          index == 0 ||
                           DateTime.fromMillisecondsSinceEpoch(
-                                      messages[index].timestamp * 1000)
-                                  .day !=
+                                messages[index].timestamp * 1000,
+                              ).day !=
                               DateTime.fromMillisecondsSinceEpoch(
-                                      messages[index - 1].timestamp * 1000)
-                                  .day;
+                                messages[index - 1].timestamp * 1000,
+                              ).day;
 
                       return Column(
                         children: [
@@ -518,7 +514,9 @@ class _WhatsappChatState extends State<WhatsappChat> {
                             Container(
                               margin: const EdgeInsets.symmetric(vertical: 10),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 5),
+                                horizontal: 15,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
                                 borderRadius: BorderRadius.circular(10),
@@ -526,10 +524,13 @@ class _WhatsappChatState extends State<WhatsappChat> {
                               child: Text(
                                 DateFormat('EEEE, MMM d').format(
                                   DateTime.fromMillisecondsSinceEpoch(
-                                      message.timestamp * 1000),
+                                    message.timestamp * 1000,
+                                  ),
                                 ),
                                 style: const TextStyle(
-                                    fontSize: 12, color: Colors.black54),
+                                  fontSize: 12,
+                                  color: Colors.black54,
+                                ),
                               ),
                             ),
                           MessageBubble(

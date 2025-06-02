@@ -56,6 +56,7 @@ class _FollowupsDetailsState extends State<FollowupsDetails> {
   bool isLoading = false;
   int _childButtonIndex = 0;
   Widget _selectedTaskWidget = Container();
+  int count = 0;
   static Map<String, int> _callLogs = {
     'all': 0,
     'outgoing': 0,
@@ -294,6 +295,13 @@ class _FollowupsDetailsState extends State<FollowupsDetails> {
         overdueTasks = List<Map<String, dynamic>>.from(data['overdueTasks']);
         overdueEvents = List<Map<String, dynamic>>.from(data['overdueEvents']);
         upcomingTasks = List<Map<String, dynamic>>.from(data['upcomingTasks']);
+        // count = data['overdueWeekTasks']['count'] ?? 0;
+        count =
+            (data['overdueWeekTasks'] != null &&
+                data['overdueWeekTasks']['count'] != null)
+            ? data['overdueWeekTasks']['count']
+            : 0;
+
         upcomingEvents = List<Map<String, dynamic>>.from(
           data['upcomingEvents'],
         );
@@ -342,16 +350,29 @@ class _FollowupsDetailsState extends State<FollowupsDetails> {
   }
 
   // The method to show the toggle options (Upcoming / Completed)
-  Widget _buildToggleOption(int index, String text) {
+  Widget _buildToggleOption(int index, String text, Color color) {
     final bool isActive = _childButtonIndex == index;
     return GestureDetector(
       onTap: () => _toggleTasks(index),
-      child: Text(
-        text,
-        style: GoogleFonts.poppins(
-          fontSize: isActive ? 18 : 12,
-          fontWeight: FontWeight.w500,
-          color: isActive ? Colors.black : Colors.grey,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        decoration: BoxDecoration(
+          color: isActive
+              ? color.withOpacity(0.2) // Light background when active
+              : Colors.transparent, // Very light grey when inactive
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: isActive ? color : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.poppins(
+            fontSize: isActive ? 12 : 12,
+            fontWeight: isActive ? FontWeight.w500 : FontWeight.w400,
+            color: isActive ? color : Colors.grey,
+          ),
         ),
       ),
     );
@@ -362,11 +383,11 @@ class _FollowupsDetailsState extends State<FollowupsDetails> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildToggleOption(0, 'Upcoming'),
+        _buildToggleOption(0, 'Upcoming', AppColors.colorsBlue),
         const SizedBox(width: 10),
-        _buildToggleOption(1, 'Completed'),
+        _buildToggleOption(1, 'Completed', AppColors.sideGreen),
         const SizedBox(width: 10),
-        _buildToggleOption(2, 'Overdue'),
+        _buildToggleOption(2, 'Overdue ($count)', AppColors.sideRed),
       ],
     );
   }
@@ -1255,21 +1276,17 @@ class _FollowupsDetailsState extends State<FollowupsDetails> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  _buildToggleSwitch(),
-                                  // TextButton(
-                                  //   onPressed: () {
-                                  //     setState(() {
-                                  //       _isHidden = !_isHidden;
-                                  //     });
-                                  //   },
-                                  //   child: Text(
-                                  //     _isHidden ? 'Show' : 'Hide',
-                                  //     style: GoogleFonts.poppins(
-                                  //         fontSize: 15,
-                                  //         fontWeight: FontWeight.w500,
-                                  //         color: Colors.black),
-                                  //   ),
-                                  // ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.backgroundLightGrey,
+                                      border: Border.all(
+                                        color: AppColors.iconGrey,
+                                        width: .5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: _buildToggleSwitch(),
+                                  ),
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
@@ -1322,39 +1339,72 @@ class _FollowupsDetailsState extends State<FollowupsDetails> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   // _buildToggleSwitch(),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Call logs',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black,
-                                        ),
+                                  Container(
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.backgroundLightGrey,
+                                      border: Border.all(
+                                        color: AppColors.iconGrey,
+                                        width: .5,
                                       ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  WhatsappChat(
-                                                    chatId: chatId,
-                                                    userName: lead_owner,
-                                                  ),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 5,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.withOpacity(0.2),
+                                            borderRadius: BorderRadius.circular(
+                                              15,
                                             ),
-                                          );
-                                        },
-                                        child: Text(
-                                          'Whatsapp',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
+                                            border: Border.all(
+                                              color: AppColors
+                                                  .colorsBlue, // Border color
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Call logs',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.colorsBlue,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        TextButton(
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    WhatsappChat(
+                                                      chatId: chatId,
+                                                      userName: lead_owner,
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            'Whatsapp',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
 
                                   IconButton(

@@ -468,7 +468,7 @@ class _AppointmentPopupState extends State<AppointmentPopup> {
               _buildButtons(
                 options: {
                   "Meeting": "Meeting",
-                  "Quotation": "Quotation",
+                  "Provide Quotation": "Provide Quotation",
                   "Showroom appointment": "Showroom appointment",
                 },
                 groupValue: _selectedSubject,
@@ -482,7 +482,7 @@ class _AppointmentPopupState extends State<AppointmentPopup> {
 
               const SizedBox(height: 10),
               _buildTextField(
-                label: 'Comments:',
+                label: 'Remarks:',
                 controller: descriptionController,
                 hint: 'Add Comments',
               ),
@@ -1032,10 +1032,10 @@ class _AppointmentPopupState extends State<AppointmentPopup> {
       ).format(rawEndTime); // Automatically set
 
       final appointmentData = {
-        'start_date': formattedStartDate,
-        'end_date': formattedEndDate, // Automatically passed to API
-        'start_time': formattedStartTime,
-        'end_time': formattedEndTime, // Automatically passed to API
+        'due_date': formattedStartDate,
+        // 'end_date': formattedEndDate, // Automatically passed to API
+        'time': formattedStartTime,
+        // 'end_time': formattedEndTime, // Automatically passed to API
         'priority': selectedPriority,
         'subject': _selectedSubject,
         'sp_id': spId,

@@ -79,8 +79,10 @@ class _OppOverdueState extends State<OppOverdue> {
       try {
         // Simple approach without canLaunchUrl check
         final phoneNumber = 'tel:$mobile';
-        launchUrl(Uri.parse(phoneNumber),
-            mode: LaunchMode.externalNonBrowserApplication);
+        launchUrl(
+          Uri.parse(phoneNumber),
+          mode: LaunchMode.externalNonBrowserApplication,
+        );
       } catch (e) {
         print('Error launching phone app: $e');
         // Show error message to user
@@ -92,9 +94,9 @@ class _OppOverdueState extends State<OppOverdue> {
       }
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No phone number available')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No phone number available')));
       }
     }
   }
@@ -172,10 +174,11 @@ class _OppOverdueState extends State<OppOverdue> {
       return SizedBox(
         height: 80,
         child: Center(
-            child: Text(
-          'No Overdue Appointment available',
-          style: AppFont.smallText12(context),
-        )),
+          child: Text(
+            'No Overdue Appointment available',
+            style: AppFont.smallText12(context),
+          ),
+        ),
       );
     }
     // return isLoading
@@ -217,14 +220,42 @@ class _OppOverdueState extends State<OppOverdue> {
       itemBuilder: (context, index) {
         var item = widget.overdueeOpp[index];
 
-        if (!(item.containsKey('assigned_to') &&
-            item.containsKey('start_date') &&
-            item.containsKey('lead_id') &&
-            item.containsKey('event_id'))) {
-          return ListTile(title: Text('Invalid data at index $index'));
-        }
+        // if (!(item.containsKey('assigned_to') &&
+        //     item.containsKey('start_date') &&
+        //     item.containsKey('lead_id') &&
+        //     item.containsKey('event_id'))) {
+        //   return ListTile(title: Text('Invalid data at index $index'));
+        // }
 
-        String eventId = item['event_id'];
+        // String eventId = item['event_id'];
+        // double swipeOffset = _swipeOffsets[eventId] ?? 0;
+
+        // return GestureDetector(
+        //   onHorizontalDragUpdate: (details) =>
+        //       _onHorizontalDragUpdate(details, eventId),
+        //   onHorizontalDragEnd: (details) =>
+        //       _onHorizontalDragEnd(details, item, index),
+        //   child: overdueeOppItem(
+        //     key: ValueKey(item['event_id']),
+        //     name: item['name'],
+        //     subject: item['subject'] ?? 'Meeting',
+        //     date: item['start_date'],
+        //     vehicle: item['PMI'] ?? 'Range Rover Velar',
+        //     leadId: item['lead_id'],
+        //     mobile: item['mobile'] ?? '',
+        //     time: item['start_time'],
+        //     eventId: item['event_id'],
+        //     isFavorite: item['favourite'] ?? false,
+        //     swipeOffset: swipeOffset,
+        //     fetchDashboardData:
+        //         () {}, // Placeholder, replace with actual method
+        //     onToggleFavorite: () {
+        //       _toggleFavorite(eventId, index);
+        //     },
+        //   ),
+        // );
+
+        String eventId = item['task_id'];
         double swipeOffset = _swipeOffsets[eventId] ?? 0;
 
         return GestureDetector(
@@ -233,19 +264,18 @@ class _OppOverdueState extends State<OppOverdue> {
           onHorizontalDragEnd: (details) =>
               _onHorizontalDragEnd(details, item, index),
           child: overdueeOppItem(
-            key: ValueKey(item['event_id']),
+            key: ValueKey(eventId),
             name: item['name'],
             subject: item['subject'] ?? 'Meeting',
-            date: item['start_date'],
+            date: item['due_date'] ?? '',
             vehicle: item['PMI'] ?? 'Range Rover Velar',
             leadId: item['lead_id'],
             mobile: item['mobile'] ?? '',
-            time: item['start_time'],
-            eventId: item['event_id'],
+            time: item['time'] ?? '',
+            eventId: eventId,
             isFavorite: item['favourite'] ?? false,
             swipeOffset: swipeOffset,
-            fetchDashboardData:
-                () {}, // Placeholder, replace with actual method
+            fetchDashboardData: () {},
             onToggleFavorite: () {
               _toggleFavorite(eventId, index);
             },
@@ -383,7 +413,7 @@ class _overdueeOppItemState extends State<overdueeOppItem>
                   gradient: LinearGradient(
                     colors: [
                       Colors.yellow.withOpacity(0.2),
-                      Colors.yellow.withOpacity(0.8)
+                      Colors.yellow.withOpacity(0.8),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -396,17 +426,21 @@ class _overdueeOppItemState extends State<overdueeOppItem>
                     children: [
                       const SizedBox(width: 15),
                       Icon(
-                          widget.isFavorite
-                              ? Icons.star_outline_rounded
-                              : Icons.star_rounded,
-                          color: const Color.fromRGBO(226, 195, 34, 1),
-                          size: 40),
+                        widget.isFavorite
+                            ? Icons.star_outline_rounded
+                            : Icons.star_rounded,
+                        color: const Color.fromRGBO(226, 195, 34, 1),
+                        size: 40,
+                      ),
                       const SizedBox(width: 10),
-                      Text(widget.isFavorite ? 'Unfavorite' : 'Favorite',
-                          style: GoogleFonts.poppins(
-                              color: Color.fromRGBO(187, 158, 0, 1),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        widget.isFavorite ? 'Unfavorite' : 'Favorite',
+                        style: GoogleFonts.poppins(
+                          color: Color.fromRGBO(187, 158, 0, 1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -429,17 +463,21 @@ class _overdueeOppItemState extends State<overdueeOppItem>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      const Icon(Icons.phone_in_talk,
-                          color: Colors.white, size: 30),
                       const SizedBox(width: 10),
-                      Text('Call',
-                          style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
+                      const Icon(
+                        Icons.phone_in_talk,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Call',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(width: 5),
                     ],
                   ),
@@ -459,14 +497,15 @@ class _overdueeOppItemState extends State<overdueeOppItem>
                   width: 8.0,
                   color: widget.isFavorite
                       ? (isCallSwipe
-                          ? Colors.green
-                              .withOpacity(0.9) // Green when swiping for a call
-                          : Colors.yellow.withOpacity(isFavoriteSwipe
-                              ? 0.1
-                              : 0.9)) // Keep yellow when favorite
+                            ? Colors.green.withOpacity(
+                                0.9,
+                              ) // Green when swiping for a call
+                            : Colors.yellow.withOpacity(
+                                isFavoriteSwipe ? 0.1 : 0.9,
+                              )) // Keep yellow when favorite
                       : (isFavoriteSwipe
-                          ? Colors.yellow.withOpacity(0.1)
-                          : (isCallSwipe ? Colors.green : AppColors.sideRed)),
+                            ? Colors.yellow.withOpacity(0.1)
+                            : (isCallSwipe ? Colors.green : AppColors.sideRed)),
                 ),
               ),
             ),
@@ -523,8 +562,10 @@ class _overdueeOppItemState extends State<overdueeOppItem>
 
         // Simple approach without canLaunchUrl check
         final phoneNumber = 'tel:${widget.mobile}';
-        launchUrl(Uri.parse(phoneNumber),
-            mode: LaunchMode.externalNonBrowserApplication);
+        launchUrl(
+          Uri.parse(phoneNumber),
+          mode: LaunchMode.externalNonBrowserApplication,
+        );
       } catch (e) {
         print('Error launching phone app: $e');
 
@@ -539,9 +580,9 @@ class _overdueeOppItemState extends State<overdueeOppItem>
       }
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No phone number available')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No phone number available')));
       }
     }
   }
@@ -598,11 +639,14 @@ class _overdueeOppItemState extends State<overdueeOppItem>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(width: 4),
-        Text(formattedTime,
-            style: GoogleFonts.poppins(
-                color: AppColors.fontColor,
-                fontWeight: FontWeight.w400,
-                fontSize: 12)),
+        Text(
+          formattedTime,
+          style: GoogleFonts.poppins(
+            color: AppColors.fontColor,
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
@@ -694,7 +738,8 @@ class _overdueeOppItemState extends State<overdueeOppItem>
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FollowupsDetails(leadId: widget.leadId)),
+              builder: (context) => FollowupsDetails(leadId: widget.leadId),
+            ),
           );
         } else {
           print("Invalid leadId");
@@ -703,10 +748,14 @@ class _overdueeOppItemState extends State<overdueeOppItem>
       child: Container(
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-            color: AppColors.arrowContainerColor,
-            borderRadius: BorderRadius.circular(30)),
-        child: const Icon(Icons.arrow_forward_ios_rounded,
-            size: 25, color: Colors.white),
+          color: AppColors.arrowContainerColor,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 25,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -742,11 +791,7 @@ class ReusableSlidableAction extends StatelessWidget {
       padding: EdgeInsets.zero,
       onPressed: (context) => onPressed(),
       backgroundColor: backgroundColor,
-      child: Icon(
-        icon,
-        size: iconSize,
-        color: foregroundColor ?? Colors.white,
-      ),
+      child: Icon(icon, size: iconSize, color: foregroundColor ?? Colors.white),
     );
   }
 }

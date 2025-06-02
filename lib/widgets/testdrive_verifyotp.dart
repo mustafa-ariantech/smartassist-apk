@@ -1,5 +1,5 @@
 import 'dart:convert';
- 
+
 import 'package:smartassist/config/component/color/colors.dart';
 import 'package:smartassist/config/component/font/font.dart';
 import 'package:smartassist/pages/Leads/home_screen.dart';
@@ -13,7 +13,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart'; 
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class TestdriveVerifyotp extends StatefulWidget {
@@ -39,9 +39,13 @@ class TestdriveVerifyotp extends StatefulWidget {
 
 class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
   final List<TextEditingController> _controllers = List.generate(
-      TestdriveVerifyotp._otpLength, (index) => TextEditingController());
-  final List<FocusNode> _focusNodes =
-      List.generate(TestdriveVerifyotp._otpLength, (index) => FocusNode());
+    TestdriveVerifyotp._otpLength,
+    (index) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(
+    TestdriveVerifyotp._otpLength,
+    (index) => FocusNode(),
+  );
 
   bool _isLoading = false;
   bool _isResendingOTP = false;
@@ -102,12 +106,8 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
                     _buildResendOption(),
                     Row(
                       children: [
-                        Expanded(
-                          child: _cancelButton(),
-                        ),
-                        Expanded(
-                          child: _buildVerifyButton(),
-                        )
+                        Expanded(child: _cancelButton()),
+                        Expanded(child: _buildVerifyButton()),
                         // _buildVerifyButton(),
                       ],
                     ),
@@ -124,21 +124,14 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
   Widget _buildHeaderImage() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Image.asset(
-        'assets/car.png',
-        width: 150,
-        fit: BoxFit.contain,
-      ),
+      child: Image.asset('assets/car.png', width: 150, fit: BoxFit.contain),
     );
   }
 
   Widget _buildTitle() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
-      child: Text(
-        'Start Test drive',
-        style: AppFont.popupTitle(context),
-      ),
+      child: Text('Start Test drive', style: AppFont.popupTitle(context)),
     );
   }
 
@@ -171,7 +164,7 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
     );
   }
 
-// Helper to hide mobile number
+  // Helper to hide mobile number
   String _hideMobileNumber(String mobile) {
     if (mobile.length >= 10) {
       // Example: 98765XXXXX
@@ -181,7 +174,7 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
     }
   }
 
-// Helper to hide email
+  // Helper to hide email
   String _hideEmail(String email) {
     if (!email.contains('@')) return email; // invalid email fallback
 
@@ -205,7 +198,7 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
     // Calculate field width based on available space
     final fieldWidth =
         (availableWidth - (spacing * (TestdriveVerifyotp._otpLength - 1))) /
-            TestdriveVerifyotp._otpLength;
+        TestdriveVerifyotp._otpLength;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -398,7 +391,8 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
 
     try {
       final url = Uri.parse(
-          'https://dev.smartassistapp.in/api/events/${widget.eventId}/verify-otp');
+        'https://dev.smartassistapp.in/api/events/${widget.eventId}/verify-otp',
+      );
       final token = await Storage.getToken();
 
       final response = await http.post(
@@ -436,8 +430,10 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
       }
     } catch (error) {
       if (!mounted) return;
-      showErrorMessage(context,
-          message: 'Verification failed. Please try again.');
+      showErrorMessage(
+        context,
+        message: 'Verification failed. Please try again.',
+      );
       debugPrint('OTP verification error: $error');
     } finally {
       if (mounted) {
@@ -550,10 +546,8 @@ class _TestdriveVerifyotpState extends State<TestdriveVerifyotp> {
                             // Clear all routes and navigate to HomeScreen
                             Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                builder: (context) => HomeScreen(
-                                  greeting: '',
-                                  leadId: '',
-                                ),
+                                builder: (context) =>
+                                    HomeScreen(greeting: '', leadId: ''),
                               ),
                               (route) => false, // This clears the stack
                             );

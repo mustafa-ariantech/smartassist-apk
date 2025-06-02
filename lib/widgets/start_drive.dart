@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:smartassist/config/component/color/colors.dart';
 import 'package:smartassist/config/component/font/font.dart';
-import 'package:smartassist/pages/Leads/home_screen.dart'; 
+import 'package:smartassist/pages/Leads/home_screen.dart';
 import 'package:smartassist/utils/storage.dart';
 import 'package:smartassist/widgets/feedback.dart';
 import 'package:smartassist/widgets/testdrive_overview.dart';
@@ -104,7 +104,8 @@ class _StartDriveMapState extends State<StartDriveMap> {
 
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.high,
+      );
 
       _handleLocationObtained(position);
     } catch (e) {
@@ -116,8 +117,10 @@ class _StartDriveMapState extends State<StartDriveMap> {
   }
 
   void _handleLocationObtained(Position position) {
-    final LatLng currentLocation =
-        LatLng(position.latitude, position.longitude);
+    final LatLng currentLocation = LatLng(
+      position.latitude,
+      position.longitude,
+    );
 
     if (mounted) {
       setState(() {
@@ -133,8 +136,9 @@ class _StartDriveMapState extends State<StartDriveMap> {
           markerId: const MarkerId('user'),
           position: currentLocation,
           infoWindow: const InfoWindow(title: 'User'),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
         );
 
         // Add the first point to route
@@ -163,8 +167,12 @@ class _StartDriveMapState extends State<StartDriveMap> {
 
   // Calculate distance between two points
   double _calculateDistance(LatLng point1, LatLng point2) {
-    return Geolocator.distanceBetween(point1.latitude, point1.longitude,
-            point2.latitude, point2.longitude) /
+    return Geolocator.distanceBetween(
+          point1.latitude,
+          point1.longitude,
+          point2.latitude,
+          point2.longitude,
+        ) /
         1000; // Convert to km
   }
 
@@ -225,14 +233,17 @@ class _StartDriveMapState extends State<StartDriveMap> {
                 position: newCoordinates,
                 infoWindow: const InfoWindow(title: 'User'),
                 icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueAzure),
+                  BitmapDescriptor.hueAzure,
+                ),
               );
 
               // Calculate distance for this segment
               if (routePoints.isNotEmpty) {
                 LatLng lastPoint = routePoints.last;
-                double segmentDistance =
-                    _calculateDistance(lastPoint, newCoordinates);
+                double segmentDistance = _calculateDistance(
+                  lastPoint,
+                  newCoordinates,
+                );
                 totalDistance += segmentDistance;
               }
 
@@ -247,8 +258,9 @@ class _StartDriveMapState extends State<StartDriveMap> {
 
               // Move camera to follow user
               if (mapController != null) {
-                mapController
-                    .animateCamera(CameraUpdate.newLatLng(newCoordinates));
+                mapController.animateCamera(
+                  CameraUpdate.newLatLng(newCoordinates),
+                );
               }
             });
           } catch (e) {
@@ -295,7 +307,8 @@ class _StartDriveMapState extends State<StartDriveMap> {
   Future<void> _startTestDrive(LatLng currentLocation) async {
     try {
       final url = Uri.parse(
-          'https://dev.smartassistapp.in/api/events/${widget.eventId}/start-drive');
+        'https://dev.smartassistapp.in/api/events/${widget.eventId}/start-drive',
+      );
       final token = await Storage.getToken();
 
       final response = await http.post(
@@ -345,40 +358,46 @@ class _StartDriveMapState extends State<StartDriveMap> {
       );
 
       positionStreamSubscription =
-          Geolocator.getPositionStream(locationSettings: locationSettings)
-              .listen((Position position) {
-        final LatLng newLocation =
-            LatLng(position.latitude, position.longitude);
-
-        // Update locally first
-        if (mounted && userMarker != null) {
-          setState(() {
-            // Update user marker position
-            userMarker = Marker(
-              markerId: const MarkerId('user'),
-              position: newLocation,
-              infoWindow: const InfoWindow(title: 'User'),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueAzure),
+          Geolocator.getPositionStream(
+            locationSettings: locationSettings,
+          ).listen((Position position) {
+            final LatLng newLocation = LatLng(
+              position.latitude,
+              position.longitude,
             );
 
-            // Calculate distance for this segment
-            if (routePoints.isNotEmpty) {
-              LatLng lastPoint = routePoints.last;
-              double segmentDistance =
-                  _calculateDistance(lastPoint, newLocation);
-              totalDistance += segmentDistance;
+            // Update locally first
+            if (mounted && userMarker != null) {
+              setState(() {
+                // Update user marker position
+                userMarker = Marker(
+                  markerId: const MarkerId('user'),
+                  position: newLocation,
+                  infoWindow: const InfoWindow(title: 'User'),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueAzure,
+                  ),
+                );
+
+                // Calculate distance for this segment
+                if (routePoints.isNotEmpty) {
+                  LatLng lastPoint = routePoints.last;
+                  double segmentDistance = _calculateDistance(
+                    lastPoint,
+                    newLocation,
+                  );
+                  totalDistance += segmentDistance;
+                }
+
+                // Add new point to route
+                routePoints.add(newLocation);
+                _updatePolyline();
+              });
             }
 
-            // Add new point to route
-            routePoints.add(newLocation);
-            _updatePolyline();
+            // Then send to server
+            _sendLocationUpdate(newLocation);
           });
-        }
-
-        // Then send to server
-        _sendLocationUpdate(newLocation);
-      });
     } catch (e) {
       print('Error starting location tracking: $e');
     }
@@ -393,7 +412,7 @@ class _StartDriveMapState extends State<StartDriveMap> {
           'latitude': location.latitude,
           'longitude': location.longitude,
         },
-        'totalDistance': totalDistance // Also send current calculated distance
+        'totalDistance': totalDistance, // Also send current calculated distance
       });
     } else {
       print('Socket not connected, trying to reconnect...');
@@ -412,8 +431,9 @@ class _StartDriveMapState extends State<StartDriveMap> {
             markerId: const MarkerId('end'),
             position: userMarker!.position,
             infoWindow: const InfoWindow(title: 'End'),
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueRed,
+            ),
           );
         }
 
@@ -429,7 +449,7 @@ class _StartDriveMapState extends State<StartDriveMap> {
     }
   }
 
-// New method to upload drive summary instead of image
+  // New method to upload drive summary instead of image
   // Future<void> _uploadDriveSummary() async {
   //   try {
   //     final url = Uri.parse(
@@ -517,7 +537,7 @@ class _StartDriveMapState extends State<StartDriveMap> {
     }
   }
 
-// Improved end drive function with more resilient error handling
+  // Improved end drive function with more resilient error handling
   Future<void> _handleEndDrive() async {
     setState(() {
       isLoading = true;
@@ -553,8 +573,10 @@ class _StartDriveMapState extends State<StartDriveMap> {
       if (!screenshotSuccess && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  'Map image could not be captured, but drive data was saved successfully')),
+            content: Text(
+              'Map image could not be captured, but drive data was saved successfully',
+            ),
+          ),
         );
       }
 
@@ -565,10 +587,8 @@ class _StartDriveMapState extends State<StartDriveMap> {
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => Feedbackscreen(
-              leadId: widget.leadId,
-              eventId: widget.eventId,
-            ),
+            builder: (context) =>
+                Feedbackscreen(leadId: widget.leadId, eventId: widget.eventId),
           ),
         );
       }
@@ -576,9 +596,9 @@ class _StartDriveMapState extends State<StartDriveMap> {
       print("Error in end drive process: $e");
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error ending test drive: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error ending test drive: $e')));
         setState(() {
           isLoading = false;
         });
@@ -623,8 +643,10 @@ class _StartDriveMapState extends State<StartDriveMap> {
       if (!screenshotSuccess && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  'Map image could not be captured, but drive data was saved successfully')),
+            content: Text(
+              'Map image could not be captured, but drive data was saved successfully',
+            ),
+          ),
         );
       }
 
@@ -646,9 +668,9 @@ class _StartDriveMapState extends State<StartDriveMap> {
       print("Error in end drive process: $e");
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error ending test drive: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error ending test drive: $e')));
         setState(() {
           isLoading = false;
         });
@@ -714,7 +736,7 @@ class _StartDriveMapState extends State<StartDriveMap> {
   //   }
   // }
 
-// Dedicated method for resource cleanup
+  // Dedicated method for resource cleanup
   void _cleanupResources() {
     try {
       if (socket != null) {
@@ -740,11 +762,12 @@ class _StartDriveMapState extends State<StartDriveMap> {
 
   // End the test drive with API call
 
-// Modify your _endTestDrive function
+  // Modify your _endTestDrive function
   Future<void> _endTestDrive() async {
     try {
       final url = Uri.parse(
-          'https://dev.smartassistapp.in/api/events/${widget.eventId}/end-drive');
+        'https://dev.smartassistapp.in/api/events/${widget.eventId}/end-drive',
+      );
       final token = await Storage.getToken();
 
       final response = await http.post(
@@ -839,17 +862,20 @@ class _StartDriveMapState extends State<StartDriveMap> {
   // Improved upload image function with better error handling
   Future<bool> _uploadImage(File file) async {
     final url = Uri.parse(
-        'https://dev.smartassistapp.in/api/events/${widget.eventId}/upload-map');
+      'https://dev.smartassistapp.in/api/events/${widget.eventId}/upload-map',
+    );
     final token = await Storage.getToken();
 
     try {
       var request = http.MultipartRequest('POST', url)
         ..headers['Authorization'] = 'Bearer $token'
-        ..files.add(await http.MultipartFile.fromPath(
-          'file',
-          file.path,
-          contentType: MediaType('image', 'png'), // Changed to PNG
-        ));
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            'file',
+            file.path,
+            contentType: MediaType('image', 'png'), // Changed to PNG
+          ),
+        );
 
       // Add a timeout to the request
       var streamedResponse = await request.send().timeout(
@@ -917,8 +943,10 @@ class _StartDriveMapState extends State<StartDriveMap> {
           backgroundColor: AppColors.backgroundLightGrey,
           title: Text('Test Drive', style: AppFont.appbarfontgrey(context)),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_outlined,
-                color: AppColors.iconGrey),
+            icon: const Icon(
+              Icons.arrow_back_ios_new_outlined,
+              color: AppColors.iconGrey,
+            ),
             onPressed: () {
               Navigator.pop(context, true);
             },
@@ -932,279 +960,300 @@ class _StartDriveMapState extends State<StartDriveMap> {
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(height: 16),
-                    Text('Getting your location...',
-                        style: TextStyle(fontSize: 16)),
+                    Text(
+                      'Getting your location...',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ],
                 ),
               )
             : error.isNotEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline,
-                              color: Colors.red, size: 48),
-                          const SizedBox(height: 16),
-                          Text(
-                            error,
-                            style: const TextStyle(
-                                color: Colors.red, fontSize: 16),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: _determinePosition,
-                            child: const Text('Try Again'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : Stack(
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration:
-                            BoxDecoration(color: AppColors.backgroundLightGrey),
-                        child: SafeArea(
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: SizedBox(
-                                      height: 400,
-                                      width: 400,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.black,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Screenshot(
-                                          controller: _screenshotController,
-                                          // child: GoogleMap(
-                                          //   onMapCreated: _onMapCreated,
-                                          //   initialCameraPosition: CameraPosition(
-                                          //     target: startMarker?.position ??
-                                          //         const LatLng(0, 0),
-                                          //     zoom: 16,
-                                          //   ),
-                                          //   myLocationEnabled: true,
-                                          //   myLocationButtonEnabled: true,
-                                          //   zoomControlsEnabled: true,
-                                          //   markers: {
-                                          //     if (startMarker != null)
-                                          //       startMarker!,
-                                          //     if (userMarker != null) userMarker!,
-                                          //     if (isDriveEnded &&
-                                          //         endMarker != null)
-                                          //       endMarker!,
-                                          //   },
-                                          //   polylines: {routePolyline},
-                                          // ),
-
-                                          child: GoogleMap(
-                                            onMapCreated: _onMapCreated,
-                                            initialCameraPosition:
-                                                CameraPosition(
-                                              target: startMarker?.position ??
-                                                  const LatLng(0, 0),
-                                              zoom: 16,
-                                            ),
-                                            myLocationEnabled: true,
-                                            myLocationButtonEnabled: true,
-                                            zoomControlsEnabled: true,
-                                            markers: {
-                                              if (startMarker != null)
-                                                startMarker!,
-                                              if (userMarker != null)
-                                                userMarker!,
-                                              if (isDriveEnded &&
-                                                  endMarker != null)
-                                                endMarker!,
-                                            },
-                                            polylines: {routePolyline},
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  if (!isDriveEnded)
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Distance: ${totalDistance.toStringAsFixed(2)} km',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              Text(
-                                                'Duration: ${_calculateDuration()} mins',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  const SizedBox(height: 10),
-                                  if (!isDriveEnded)
-                                    SizedBox(
-                                      width: double.infinity,
-                                      height: 50,
-                                      child: ElevatedButton(
-                                        // Update the button onPressed handler
-                                        onPressed: () async {
-                                          try {
-                                            // First try to capture and upload the image
-                                            try {
-                                              await _captureAndUploadImage();
-                                            } catch (e) {
-                                              // Log but don't block the flow if screenshot fails
-                                              print(
-                                                  "Screenshot capture/upload failed: $e");
-                                              // Maybe show a toast notification
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                    content: Text(
-                                                        'Could not capture map image: $e')),
-                                              );
-                                            }
-
-                                            // Continue with ending the drive regardless of screenshot success
-                                            await _submitEndDrive();
-                                            // await _handleEndDrive();
-                                          } catch (e) {
-                                            // Handle errors with the end drive API call
-                                            print("Error ending drive: $e");
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Error ending drive: $e')),
-                                            );
-                                          }
-                                        },
-                                        // onPressed: () {
-                                        //   _endTestDrive();
-                                        //   _captureAndUploadImage();
-                                        // },
-                                        style: ElevatedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          backgroundColor:
-                                              AppColors.colorsBlueButton,
-                                        ),
-                                        child: Text(
-                                            'End Test Drive & Submit Feedback Now',
-                                            style: GoogleFonts.poppins(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white)),
-                                      ),
-                                    ),
-                                  const SizedBox(height: 10),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 50,
-                                    child: ElevatedButton(
-                                      onPressed: () async {
-                                        try {
-                                          // First try to capture and upload the image
-                                          try {
-                                            await _captureAndUploadImage();
-                                          } catch (e) {
-                                            // Log but don't block the flow if screenshot fails
-                                            print(
-                                                "Screenshot capture/upload failed: $e");
-                                            // Maybe show a toast notification
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Could not capture map image: $e')),
-                                            );
-                                          }
-
-                                          // Continue with ending the drive regardless of screenshot success
-                                          await _submitEndDriveNavigate();
-                                        } catch (e) {
-                                          // Handle errors with the end drive API call
-                                          print("Error ending drive: $e");
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                                    'Error ending drive: $e')),
-                                          );
-                                        }
-                                      },
-
-                                      // onPressed: () {
-                                      //   Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           TestdriveOverview(
-                                      //         eventId: widget.eventId,
-                                      //         leadId: widget.leadId,
-                                      //       ),
-                                      //     ),
-                                      //   );
-                                      // },
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        backgroundColor: Colors.black,
-                                      ),
-                                      child: Text(
-                                        'End Test Drive & Submit Feedback Later',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 48,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        error,
+                        style: const TextStyle(color: Colors.red, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _determinePosition,
+                        child: const Text('Try Again'),
                       ),
                     ],
                   ),
+                ),
+              )
+            : Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundLightGrey,
+                    ),
+                    child: SafeArea(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(15),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: SizedBox(
+                                  height: 400,
+                                  width: 400,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Screenshot(
+                                      controller: _screenshotController,
+
+                                      // child: GoogleMap(
+                                      //   onMapCreated: _onMapCreated,
+                                      //   initialCameraPosition: CameraPosition(
+                                      //     target: startMarker?.position ??
+                                      //         const LatLng(0, 0),
+                                      //     zoom: 16,
+                                      //   ),
+                                      //   myLocationEnabled: true,
+                                      //   myLocationButtonEnabled: true,
+                                      //   zoomControlsEnabled: true,
+                                      //   markers: {
+                                      //     if (startMarker != null)
+                                      //       startMarker!,
+                                      //     if (userMarker != null) userMarker!,
+                                      //     if (isDriveEnded &&
+                                      //         endMarker != null)
+                                      //       endMarker!,
+                                      //   },
+                                      //   polylines: {routePolyline},
+                                      // ),
+                                      child: GoogleMap(
+                                        onMapCreated: _onMapCreated,
+                                        initialCameraPosition: CameraPosition(
+                                          target:
+                                              startMarker?.position ??
+                                              const LatLng(0, 0),
+                                          zoom: 16,
+                                        ),
+                                        myLocationEnabled: true,
+                                        myLocationButtonEnabled: true,
+                                        zoomControlsEnabled: true,
+                                        markers: {
+                                          if (startMarker != null) startMarker!,
+                                          if (userMarker != null) userMarker!,
+                                          if (isDriveEnded && endMarker != null)
+                                            endMarker!,
+                                        },
+                                        polylines: {routePolyline},
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              if (!isDriveEnded)
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Distance: ${totalDistance.toStringAsFixed(2)} km',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Duration: ${_calculateDuration()} mins',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 10),
+                              if (!isDriveEnded)
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    // Update the button onPressed handler
+                                    onPressed: () async {
+                                      try {
+                                        // First try to capture and upload the image
+                                        try {
+                                          await _captureAndUploadImage();
+                                        } catch (e) {
+                                          // Log but don't block the flow if screenshot fails
+                                          print(
+                                            "Screenshot capture/upload failed: $e",
+                                          );
+                                          // Maybe show a toast notification
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Could not capture map image: $e',
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        // Continue with ending the drive regardless of screenshot success
+                                        await _submitEndDrive();
+                                        // await _handleEndDrive();
+                                      } catch (e) {
+                                        // Handle errors with the end drive API call
+                                        print("Error ending drive: $e");
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Error ending drive: $e',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    // onPressed: () {
+                                    //   _endTestDrive();
+                                    //   _captureAndUploadImage();
+                                    // },
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      backgroundColor:
+                                          AppColors.colorsBlueButton,
+                                    ),
+                                    child: Text(
+                                      'End Test Drive & Submit Feedback Now',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    try {
+                                      // First try to capture and upload the image
+                                      try {
+                                        await _captureAndUploadImage();
+                                      } catch (e) {
+                                        // Log but don't block the flow if screenshot fails
+                                        print(
+                                          "Screenshot capture/upload failed: $e",
+                                        );
+                                        // Maybe show a toast notification
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Could not capture map image: $e',
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      // Continue with ending the drive regardless of screenshot success
+                                      await _submitEndDriveNavigate();
+                                    } catch (e) {
+                                      // Handle errors with the end drive API call
+                                      print("Error ending drive: $e");
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Error ending drive: $e',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+
+                                  // onPressed: () {
+                                  //   Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //       builder: (context) =>
+                                  //           TestdriveOverview(
+                                  //         eventId: widget.eventId,
+                                  //         leadId: widget.leadId,
+                                  //       ),
+                                  //     ),
+                                  //   );
+                                  // },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    backgroundColor: Colors.black,
+                                  ),
+                                  child: Text(
+                                    'End Test Drive & Submit Feedback Later',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

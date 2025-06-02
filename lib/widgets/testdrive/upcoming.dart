@@ -75,7 +75,11 @@ class _TestUpcomingState extends State<TestUpcoming> {
       context,
       MaterialPageRoute(
         builder: (context) => TestdriveVerifyotp(
-            email: email, mobile: mobile, leadId: leadId, eventId: eventId),
+          email: email,
+          mobile: mobile,
+          leadId: leadId,
+          eventId: eventId,
+        ),
       ),
     );
     print("Call action triggered for ${item['name']}");
@@ -135,9 +139,7 @@ class _TestUpcomingState extends State<TestUpcoming> {
   // }
 
   Future<void> _getOtp(String eventId) async {
-    final success = await LeadsSrv.getOtp(
-      eventId: eventId,
-    );
+    final success = await LeadsSrv.getOtp(eventId: eventId);
 
     if (success) {
       print('✅ Test drive started successfully');
@@ -185,10 +187,11 @@ class _TestUpcomingState extends State<TestUpcoming> {
       return SizedBox(
         height: 80,
         child: Center(
-            child: Text(
-          'No upcoming TestDrive available',
-          style: AppFont.smallText12(context),
-        )),
+          child: Text(
+            'No upcoming TestDrive available',
+            style: AppFont.smallText12(context),
+          ),
+        ),
       );
     }
 
@@ -217,30 +220,30 @@ class _TestUpcomingState extends State<TestUpcoming> {
           onHorizontalDragEnd: (details) =>
               _onHorizontalDragEnd(details, item, index),
           child: upcomingTestDrivesItem(
-              key: ValueKey(item['event_id']),
-              name: item['name'],
-              vehicle: item['PMI'] ?? 'Range Rover Velar',
-              subject: item['subject'] ?? 'Meeting',
-              date: item['start_date'],
-              email: item['updated_by'],
-              leadId: item['lead_id'],
-              startTime: item['start_time'],
-              eventId: item['event_id'],
-              isFavorite: item['favourite'] ?? false,
-              swipeOffset: swipeOffset,
-              onToggleFavorite: () {
-                _toggleFavorite(eventId, index);
-              },
-              otpTrigger: () {
-                _getOtp(eventId);
-              },
-              fetchDashboardData: () {},
-              handleTestDrive: () {
-                _handleTestDrive(item);
-              }
+            key: ValueKey(item['event_id']),
+            name: item['name'],
+            vehicle: item['PMI'] ?? 'Range Rover Velar',
+            subject: item['subject'] ?? 'Meeting',
+            date: item['start_date'],
+            email: item['updated_by'],
+            leadId: item['lead_id'],
+            startTime: item['start_time'],
+            eventId: item['event_id'],
+            isFavorite: item['favourite'] ?? false,
+            swipeOffset: swipeOffset,
+            onToggleFavorite: () {
+              _toggleFavorite(eventId, index);
+            },
+            otpTrigger: () {
+              _getOtp(eventId);
+            },
+            fetchDashboardData: () {},
+            handleTestDrive: () {
+              _handleTestDrive(item);
+            },
 
-              // Placeholder, replace with actual method
-              ),
+            // Placeholder, replace with actual method
+          ),
         );
       },
     );
@@ -372,7 +375,7 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
                   gradient: LinearGradient(
                     colors: [
                       Colors.yellow.withOpacity(0.2),
-                      Colors.yellow.withOpacity(0.8)
+                      Colors.yellow.withOpacity(0.8),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -385,17 +388,21 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
                     children: [
                       const SizedBox(width: 15),
                       Icon(
-                          widget.isFavorite
-                              ? Icons.star_outline_rounded
-                              : Icons.star_rounded,
-                          color: const Color.fromRGBO(226, 195, 34, 1),
-                          size: 40),
+                        widget.isFavorite
+                            ? Icons.star_outline_rounded
+                            : Icons.star_rounded,
+                        color: const Color.fromRGBO(226, 195, 34, 1),
+                        size: 40,
+                      ),
                       const SizedBox(width: 10),
-                      Text(widget.isFavorite ? 'Unfavorite' : 'Favorite',
-                          style: GoogleFonts.poppins(
-                              color: Color.fromRGBO(187, 158, 0, 1),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        widget.isFavorite ? 'Unfavorite' : 'Favorite',
+                        style: GoogleFonts.poppins(
+                          color: Color.fromRGBO(187, 158, 0, 1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -408,10 +415,7 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
               child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [
-                      AppColors.colorsBlue,
-                      AppColors.colorsBlue,
-                    ],
+                    colors: [AppColors.colorsBlue, AppColors.colorsBlue],
                     begin: Alignment.centerRight,
                     end: Alignment.centerLeft,
                   ),
@@ -421,17 +425,21 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const SizedBox(
-                        width: 20,
+                      const SizedBox(width: 20),
+                      const Icon(
+                        Icons.directions_car,
+                        color: Colors.white,
+                        size: 30,
                       ),
-                      const Icon(Icons.directions_car,
-                          color: Colors.white, size: 30),
                       const SizedBox(width: 10),
-                      Text('Start Test Drive',
-                          style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
+                      Text(
+                        'Start Test Drive',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(width: 5),
                     ],
                   ),
@@ -451,16 +459,17 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
                   width: 8.0,
                   color: widget.isFavorite
                       ? (isCallSwipe
-                          ? Colors.blue
-                              .withOpacity(0.2) // Green when swiping for a call
-                          : Colors.yellow.withOpacity(isFavoriteSwipe
-                              ? 0.1
-                              : 0.9)) // Keep yellow when favorite
+                            ? Colors.blue.withOpacity(
+                                0.2,
+                              ) // Green when swiping for a call
+                            : Colors.yellow.withOpacity(
+                                isFavoriteSwipe ? 0.1 : 0.9,
+                              )) // Keep yellow when favorite
                       : (isFavoriteSwipe
-                          ? Colors.yellow.withOpacity(0.1)
-                          : (isCallSwipe
-                              ? Colors.blue.withOpacity(0.2)
-                              : AppColors.sideGreen)),
+                            ? Colors.yellow.withOpacity(0.1)
+                            : (isCallSwipe
+                                  ? Colors.blue.withOpacity(0.2)
+                                  : AppColors.sideGreen)),
                 ),
               ),
             ),
@@ -557,11 +566,14 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(width: 4),
-        Text(formattedTime,
-            style: GoogleFonts.poppins(
-                color: AppColors.fontColor,
-                fontWeight: FontWeight.w400,
-                fontSize: 12)),
+        Text(
+          formattedTime,
+          style: GoogleFonts.poppins(
+            color: AppColors.fontColor,
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
@@ -624,8 +636,9 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
 
   Widget _buildCarModel(BuildContext context) {
     return ConstrainedBox(
-      constraints:
-          const BoxConstraints(maxWidth: 100), // Adjust width as needed
+      constraints: const BoxConstraints(
+        maxWidth: 100,
+      ), // Adjust width as needed
       child: Text(
         widget.vehicle,
         style: AppFont.dashboardCarName(context),
@@ -643,7 +656,8 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FollowupsDetails(leadId: widget.leadId)),
+              builder: (context) => FollowupsDetails(leadId: widget.leadId),
+            ),
           );
         } else {
           print("Invalid leadId");
@@ -652,10 +666,14 @@ class _upcomingTestDrivesItemState extends State<upcomingTestDrivesItem> {
       child: Container(
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-            color: AppColors.arrowContainerColor,
-            borderRadius: BorderRadius.circular(30)),
-        child: const Icon(Icons.arrow_forward_ios_rounded,
-            size: 25, color: Colors.white),
+          color: AppColors.arrowContainerColor,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 25,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -689,11 +707,7 @@ class ReusableSlidableAction extends StatelessWidget {
     return CustomSlidableAction(
       onPressed: (context) => onPressed(),
       backgroundColor: backgroundColor,
-      child: Icon(
-        icon,
-        size: iconSize,
-        color: foregroundColor ?? Colors.white,
-      ),
+      child: Icon(icon, size: iconSize, color: foregroundColor ?? Colors.white),
     );
   }
 }

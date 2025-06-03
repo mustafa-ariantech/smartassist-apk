@@ -546,7 +546,8 @@ class _AppointmentPopupState extends State<AppointmentPopup> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: AppColors.containerBg,
-                    hintText: selectedLeadsName ?? 'Select Leads',
+                    hintText:
+                        selectedLeadsName ?? 'Search by name, email or phone',
                     hintStyle: TextStyle(
                       color: selectedLeadsName != null
                           ? Colors.black

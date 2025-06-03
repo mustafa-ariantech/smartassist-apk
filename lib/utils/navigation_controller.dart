@@ -96,7 +96,7 @@ class NavigationController extends GetxController {
 
     // Insert MyTeams screen only for SM role
     if (userRole.value == "SM") {
-      baseScreens.insert(1, const MyTeams());
+      baseScreens.insert(0, const MyTeams());
       baseScreens.insert(2, CalendarSm(leadName: ''));
     } else {
       // Regular calendar screen for other roles
@@ -121,9 +121,9 @@ class NavigationController extends GetxController {
   void _setInitialScreen() {
     // For SM users, we can set default to teams screen if desired
     if (userRole.value == "SM") {
-      selectedIndex.value = 1; // Teams screen
+      selectedIndex.value = 0; // Teams screen
     } else {
-      selectedIndex.value = 0; // Home screen
+      selectedIndex.value = 1; // Home screen
     }
   }
 }

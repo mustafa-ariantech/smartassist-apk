@@ -52,15 +52,17 @@ class BottomNavigation extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 0),
           child: Obx(() {
-            List<Widget> navItems = [
-              _buildNavItem(
-                icon: Icons.home,
-                label: 'Home',
-                index: 0,
-                isIcon: true,
-                isImg: false,
-              ),
-            ];
+            List<Widget> navItems = [];
+
+            //  List<Widget> navItems = [
+            //   _buildNavItem(
+            //     icon: Icons.home,
+            //     label: 'Home',
+            //     index: 0,
+            //     isIcon: true,
+            //     isImg: false,
+            //   ),
+            // ];
 
             // Insert Teams navigation only for SM role
             if (controller.userRole.value == "SM") {
@@ -68,6 +70,16 @@ class BottomNavigation extends StatelessWidget {
                 _buildNavItem(
                   icon: Icons.people_alt_outlined,
                   label: 'My Teams',
+                  index: 0,
+                  isIcon: true,
+                  isImg: false,
+                ),
+              );
+              // Home comes second at index 1
+              navItems.add(
+                _buildNavItem(
+                  icon: Icons.home,
+                  label: 'Home',
                   index: 1,
                   isIcon: true,
                   isImg: false,
@@ -83,7 +95,7 @@ class BottomNavigation extends StatelessWidget {
                   label: 'My Calendar',
                   index: 2,
                   isIcon: true,
-                  isImg: false,
+                  img: Image.asset('assets/calendar.png', fit: BoxFit.contain),
                 ),
               );
             } else {
@@ -95,6 +107,16 @@ class BottomNavigation extends StatelessWidget {
                   img: Image.asset('assets/calendar.png', fit: BoxFit.contain),
                   label: 'Calendar',
                   index: 1,
+                ),
+              );
+
+              navItems.add(
+                _buildNavItem(
+                  icon: Icons.home,
+                  label: 'Home',
+                  index: 0,
+                  isIcon: true,
+                  isImg: false,
                 ),
               );
             }

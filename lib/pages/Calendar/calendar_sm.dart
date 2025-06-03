@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:smartassist/config/component/color/colors.dart';
 import 'package:smartassist/config/getX/fab.controller.dart';
 import 'package:smartassist/pages/Leads/single_details_pages/singleLead_followup.dart';
-import 'package:smartassist/services/leads_srv.dart';
 import 'package:smartassist/utils/storage.dart';
 import 'package:smartassist/widgets/calender/calender.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -24,11 +23,18 @@ class CalendarSm extends StatefulWidget {
 }
 
 class _CalendarSmState extends State<CalendarSm> {
+  Map<String, dynamic> _teamData = {};
+  List<Map<String, dynamic>> _teamMembers = [];
+  int _selectedProfileIndex = 0;
+  String _selectedUserId = '';
+  String _selectedType = 'your'; // 'your' or 'team'
+
   DateTime _focusedDay = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.week;
   bool _isMonthView = false;
-  List<dynamic> appointments = [];
   List<dynamic> tasks = [];
+  List<dynamic> events = [];
+  List<dynamic> appointments = [];
   DateTime? _selectedDay;
   bool _isLoading = false;
   ScrollController _timelineScrollController = ScrollController();
@@ -49,7 +55,9 @@ class _CalendarSmState extends State<CalendarSm> {
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    _fetchInitialData();
+    _fetchTeamDetails();
+    // Initial load with 'your' data (no user_id)
+    _fetchActivitiesData();
 
     // Scroll to current hour when view loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -82,7 +90,55 @@ class _CalendarSmState extends State<CalendarSm> {
     );
   }
 
-  Future<void> _fetchInitialData() async {
+  Future<void> _fetchTeamDetails() async {
+    try {
+      final token = await Storage.getToken();
+
+      final baseUri = Uri.parse(
+        'https://api.smartassistapp.in/api/users/sm/dashboard/team-dashboard',
+      );
+
+      final response = await http.get(
+        baseUri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print('📥 Team Details Status Code: ${response.statusCode}');
+      print('📥 Team Details Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        setState(() {
+          _teamData = data['data'] ?? {};
+
+          if (_teamData.containsKey('allMember') &&
+              _teamData['allMember'].isNotEmpty) {
+            _teamMembers = [];
+
+            for (var member in _teamData['allMember']) {
+              _teamMembers.add({
+                'fname': member['fname'] ?? '',
+                'lname': member['lname'] ?? '',
+                'user_id': member['user_id'] ?? '',
+                'profile': member['profile'],
+                'initials': member['initials'] ?? '',
+              });
+            }
+          }
+        });
+      } else {
+        throw Exception('Failed to fetch team details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching team details: $e');
+    }
+  }
+
+  Future<void> _fetchActivitiesData() async {
     if (mounted) {
       setState(() {
         _isLoading = true;
@@ -91,37 +147,52 @@ class _CalendarSmState extends State<CalendarSm> {
 
     try {
       final token = await Storage.getToken();
-      const String apiUrl = "https://api.smartassistapp.in/api/tasks/all-tasks";
+      // Format the selected date
+      String formattedDate = DateFormat(
+        'dd-MM-yyyy',
+      ).format(_selectedDay ?? _focusedDay);
+
+      // Build query parameters
+      final Map<String, String> queryParams = {'date': formattedDate};
+
+      // Add user_id only if team member is selected (not for 'your' option)
+      if (_selectedType == 'team' && _selectedUserId.isNotEmpty) {
+        queryParams['user_id'] = _selectedUserId;
+      }
+
+      final baseUrl = Uri.parse(
+        "https://api.smartassistapp.in/api/calendar/activities/all/asondate",
+      );
+      final uri = baseUrl.replace(queryParameters: queryParams);
+
+      print('📤 Fetching activities from: $uri');
       final response = await http.get(
-        Uri.parse(apiUrl),
+        uri,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
+
+      print('📥 Activities Status Code: ${response.statusCode}');
+      print('📥 Activities Response: ${response.body}');
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         setState(() {
-          // count = data['data']['overdueWeekTasks']?['count'] ?? 0;
-          // _originalUpcomingTasks =
-          //     data['data']['tasks'] ?? [];
-          // _originalOverdueTasks =
-          //     data['data']['events'] ?? [];
-
-          // _filteredAllTasks = List.from(_originalAllTasks);
-          // _filteredUpcomingTasks = List.from(_originalUpcomingTasks);
-          // _filteredOverdueTasks = List.from(_originalOverdueTasks);
+          tasks = data['data']['tasks'] ?? [];
+          events = data['data']['events'] ?? [];
           _isLoading = false;
         });
+
+        // Process the time slots after fetching data
+        _processTimeSlots();
       } else {
         setState(() => _isLoading = false);
+        print('Failed to fetch activities: ${response.statusCode}');
       }
-      // await _fetchAppointments(_selectedDay ?? _focusedDay);
-      // await _fetchTasks(_selectedDay ?? _focusedDay);
-      // _processTimeSlots();
     } catch (e) {
-      print("Error fetching initial data: $e");
-    } finally {
+      print("Error fetching activities data: $e");
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -136,12 +207,14 @@ class _CalendarSmState extends State<CalendarSm> {
     _expandedHours.clear();
     _timeSlotItems.clear();
 
-    // Process appointments
-    for (var appointment in appointments) {
-      final startTime = _parseTimeString(appointment['start_time'] ?? '00:00');
-      final endTime = _parseTimeString(appointment['end_time'] ?? '00:00');
+    // Process events (appointments)
+    for (var event in events) {
+      final startTime = _parseTimeString(event['start_time'] ?? '00:00');
+      final endTime = startTime.add(
+        Duration(hours: 1),
+      ); // Default 1 hour duration
 
-      // Mark all hours covered by this appointment as active
+      // Mark all hours covered by this event as active
       for (int hour = startTime.hour; hour <= endTime.hour; hour++) {
         _activeHours.add(hour);
       }
@@ -152,8 +225,8 @@ class _CalendarSmState extends State<CalendarSm> {
         _timeSlotItems[timeKey] = [];
       }
       _timeSlotItems[timeKey]!.add({
-        'item': appointment,
-        'type': 'appointment',
+        'item': event,
+        'type': 'event',
         'startTime': startTime,
         'endTime': endTime,
       });
@@ -161,11 +234,11 @@ class _CalendarSmState extends State<CalendarSm> {
 
     // Process tasks
     for (var task in tasks) {
-      String dueDate = task['due_date'] ?? '00:00';
       DateTime taskTime;
 
-      if (dueDate.contains(':')) {
-        taskTime = _parseTimeString(dueDate);
+      // Parse task time
+      if (task['time'] != null && task['time'].toString().isNotEmpty) {
+        taskTime = _parseTimeString(task['time']);
       } else {
         taskTime = DateTime(2022, 1, 1, 9, 0); // Default to 9 AM
       }
@@ -238,34 +311,13 @@ class _CalendarSmState extends State<CalendarSm> {
         : 60.0; // Default height
   }
 
-  Future<void> _fetchAppointments(DateTime selectedDate) async {
-    final data = await LeadsSrv.fetchAppointments(selectedDate);
-    if (!mounted) return;
-    setState(() {
-      appointments = data;
-      _isLoading = false;
-    });
-    print("Appointments Fetched: $appointments");
-    _processTimeSlots();
-  }
-
-  Future<void> _fetchTasks(DateTime selectedDate) async {
-    final data = await LeadsSrv.fetchtasks(selectedDate);
-    if (!mounted) return;
-    setState(() {
-      tasks = data;
-      _isLoading = false;
-    });
-    print("Tasks Fetched: $tasks");
-    _processTimeSlots();
-  }
-
   void _handleDateSelected(DateTime selectedDate) {
     setState(() {
       _selectedDay = selectedDate;
       _focusedDay = selectedDate;
-      appointments = [];
       tasks = [];
+      events = [];
+      appointments = [];
       _activeHours.clear();
       _expandedHours.clear();
       _timeSlotItems.clear();
@@ -276,8 +328,33 @@ class _CalendarSmState extends State<CalendarSm> {
     print('Selected Date State: ${_selectedDay}');
     print('Fetching data for date: $formattedDate');
 
-    _fetchAppointments(selectedDate);
-    _fetchTasks(selectedDate);
+    _fetchActivitiesData();
+  }
+
+  // Handle team/your selection
+  void _handleTeamYourSelection(String type) async {
+    setState(() {
+      _selectedType = type;
+      if (type == 'your') {
+        _selectedProfileIndex = 0;
+        _selectedUserId = '';
+      }
+      _isLoading = true;
+    });
+
+    await _fetchActivitiesData();
+  }
+
+  // Handle team member selection
+  void _handleTeamMemberSelection(int index, String userId) async {
+    setState(() {
+      _selectedProfileIndex = index;
+      _selectedUserId = userId;
+      _selectedType = 'team';
+      _isLoading = true;
+    });
+
+    await _fetchActivitiesData();
   }
 
   // Initialize the controller
@@ -319,6 +396,13 @@ class _CalendarSmState extends State<CalendarSm> {
         children: [
           Column(
             children: [
+              // _buildProfileAvatars(),
+              // Team/Your selection buttons
+              _buildTeamYourButtons(),
+
+              // Team members avatars (show only when team is selected)
+              if (_selectedType == 'team') _buildProfileAvatars(),
+
               // Calendar at the top
               CalenderWidget(
                 key: ValueKey(_calendarFormat),
@@ -355,12 +439,171 @@ class _CalendarSmState extends State<CalendarSm> {
     );
   }
 
+  Widget _buildTeamYourButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 30,
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.arrowContainerColor,
+            border: Border.all(color: Colors.grey, width: 1),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 100,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: _selectedType == 'team'
+                      ? Colors.white
+                      : AppColors.backgroundLightGrey,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: TextButton(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                  onPressed: () => _handleTeamYourSelection('team'),
+                  child: Text(
+                    'Team',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: _selectedType == 'team'
+                          ? AppColors.fontColor
+                          : AppColors.fontColor,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 100,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: _selectedType == 'your'
+                      ? Colors.white
+                      : AppColors.backgroundLightGrey,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: TextButton(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                  onPressed: () => _handleTeamYourSelection('your'),
+                  child: Text(
+                    'Your',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: _selectedType == 'your'
+                          ? AppColors.fontColor
+                          : AppColors.fontColor,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileAvatars() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        margin: const EdgeInsets.only(top: 10),
+        height: 90,
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            for (int i = 0; i < _teamMembers.length; i++)
+              _buildProfileAvatar(
+                _teamMembers[i]['fname'] ?? '',
+                i + 1, // Starts from 1 because 0 is 'All'
+                _teamMembers[i]['user_id'] ?? '',
+                _teamMembers[i]['profile'], // Pass the profile URL
+                _teamMembers[i]['initials'] ?? '', // Pass the initials
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Individual profile avatar
+  Widget _buildProfileAvatar(
+    String firstName,
+    int index,
+    String userId,
+    String? profileUrl,
+    String initials,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: () => _handleTeamMemberSelection(index, userId),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 15),
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.backgroundLightGrey,
+              border: _selectedProfileIndex == index
+                  ? Border.all(color: Colors.blue, width: 2)
+                  : null,
+            ),
+            child: ClipOval(
+              child: profileUrl != null && profileUrl.isNotEmpty
+                  ? Image.network(
+                      profileUrl,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback to initials if image fails to load
+                        return Center(
+                          child: Text(
+                            initials.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        initials.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          firstName,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
   Widget _buildImprovedTimelineView() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator(color: Colors.blue));
     }
 
-    final combinedItems = [...appointments, ...tasks];
+    final combinedItems = [...tasks, ...events];
     if (combinedItems.isEmpty) {
       return const Center(
         child: Column(
@@ -512,9 +755,9 @@ class _CalendarSmState extends State<CalendarSm> {
         final itemPosition = basePosition + verticalOffset;
 
         // Add widget based on type
-        if (itemType == 'appointment') {
+        if (itemType == 'event') {
           allWidgets.add(
-            _buildAppointmentItem(
+            _buildEventItem(
               item,
               basePosition: itemPosition,
               width: MediaQuery.of(context).size.width - 67,
@@ -541,7 +784,7 @@ class _CalendarSmState extends State<CalendarSm> {
     return allWidgets;
   }
 
-  Widget _buildAppointmentItem(
+  Widget _buildEventItem(
     dynamic item, {
     double basePosition = 0.0,
     double width = 200.0,
@@ -549,8 +792,8 @@ class _CalendarSmState extends State<CalendarSm> {
     double widthFactor = 1.0,
     double leftOffset = 0.0,
   }) {
-    // Determine color and title for appointment
-    Color cardColor = _getAppointmentColor(item);
+    // Determine color and title for event
+    Color cardColor = _getTaskColor(item);
 
     // Get the lead_id from the item
     String leadId = item['lead_id']?.toString() ?? '';
@@ -559,10 +802,11 @@ class _CalendarSmState extends State<CalendarSm> {
     String formattedStartTime = _formatTimeFor12Hour(
       item['start_time'] ?? '00:00',
     );
-    String formattedEndTime = _formatTimeFor12Hour(item['end_time'] ?? '00:00');
 
-    String title = 'Appointment: ${item['name'] ?? 'No Name'}';
-    String time = '$formattedStartTime - $formattedEndTime';
+    String title =
+        '${item['category']?.toString().toUpperCase() ?? 'EVENT'}: ${item['name'] ?? 'No Name'}';
+    String time = formattedStartTime;
+    String pmi = item['PMI'] ?? '';
 
     return Positioned(
       top: basePosition,
@@ -621,6 +865,25 @@ class _CalendarSmState extends State<CalendarSm> {
                         time,
                         style: TextStyle(fontSize: 12, color: Colors.white70),
                       ),
+                      if (pmi.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        const Icon(
+                          Icons.directions_car,
+                          size: 12,
+                          color: Colors.white70,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            pmi,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
               ],
@@ -630,6 +893,86 @@ class _CalendarSmState extends State<CalendarSm> {
       ),
     );
   }
+
+  // Widget _buildTaskItem(
+  //   dynamic item, {
+  //   double basePosition = 0.0,
+  //   double width = 200.0,
+  //   double height = 60.0,
+  //   double widthFactor = 1.0,
+  //   double leftOffset = 0.0,
+  // }) {
+  //   // Get the lead_id from the item
+  //   String leadId = item['lead_id']?.toString() ?? '';
+
+  //   // Format the time in 12-hour format with AM/PM
+  //   String formattedDueTime = _formatTimeFor12Hour(item['time'] ?? '00:00');
+
+  //   // Determine color and title for task
+  //   Color cardColor = _getTaskColor(item);
+  //   String title = '${item['category']?.toString().toUpperCase() ?? 'TASK'}: ${item['name'] ?? item['subject'] ?? 'No Subject'}';
+  //   String status = item['status'] ?? 'Unknown';
+  //   String pmi = item['PMI'] ?? '';
+
+  //   // Add due time to status display if available
+  //   String timeInfo = formattedDueTime.isNotEmpty ? ' • $formattedDueTime' : '';
+
+  //   return Positioned(
+  //     top: basePosition,
+  //     left: 8 + (width * leftOffset),
+  //     width: (width * widthFactor) - 8, // Account for right margin
+  //     height: height,
+  //     child: Card(
+  //       margin: const EdgeInsets.only(bottom: 4, right: 4),
+  //       color: cardColor,
+  //       elevation: 2,
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  //       child: InkWell(
+  //         onTap: () {
+  //           print('Navigating with task leadId: $leadId');
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => FollowupsDetails(leadId: leadId),
+  //             ),
+  //           );
+  //         },
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Row(
+  //                 children: [
+  //                   Icon(Icons.task, size: 14, color: Colors.white),
+  //                   SizedBox(width: 4),
+  //                   Expanded(
+  //                     child: Text(
+  //                       title,
+  //                       style: TextStyle(
+  //                         fontWeight: FontWeight.bold,
+  //                         color: Colors.white,
+  //                         fontSize: 13,
+  //                       ),
+  //                       maxLines: 1,
+  //                       overflow: TextOverflow.ellipsis,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //               const SizedBox(height: 2),
+  //               Row(
+  //                 children: [
+  //                   const Icon(Icons.info_outline, size: 12, color: Colors.white70),
+  //                   const SizedBox(width: 4),
+  //                   Text(
+  //                     '$status$timeInfo',
+  //                     style: const TextStyle(
+  //                       fontSize: 12,
+  //                       color: Colors.white70,
+  //                     ),
+  //                   ),
+  //                   if (
 
   Widget _buildTaskItem(
     dynamic item, {

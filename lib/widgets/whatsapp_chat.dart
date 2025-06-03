@@ -161,7 +161,7 @@ class _WhatsappChatState extends State<WhatsappChat> {
     // if (socket != null && socket.connected) {
     //   socket.disconnect();
     // }
-    socket = IO.io('wss://dev.smartassistapp.in', <String, dynamic>{
+    socket = IO.io('wss://api.smartassistapp.in', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
       'reconnection': true,
@@ -713,7 +713,7 @@ class _WhatsappChatState extends State<WhatsappChat> {
 
 //   // Fix the socket initialization to better handle connection and events
 //   void initSocket() {
-//     socket = IO.io('wss://dev.smartassistapp.in', <String, dynamic>{
+//     socket = IO.io('wss://api.smartassistapp.in', <String, dynamic>{
 //       'transports': ['websocket'],
 //       'autoConnect': true,
 //     });
@@ -788,7 +788,7 @@ class _WhatsappChatState extends State<WhatsappChat> {
 //   }
 
 //   // void initSocket() {
-//   //   socket = IO.io('wss://dev.smartassistapp.in', <String, dynamic>{
+//   //   socket = IO.io('wss://api.smartassistapp.in', <String, dynamic>{
 //   //     'transports': ['websocket'],
 //   //     'autoConnect': true,
 //   //   });
@@ -840,7 +840,7 @@ class _WhatsappChatState extends State<WhatsappChat> {
 //   // }
 
 //   // void initSocket() {
-//   //   socket = IO.io('wss://dev.smartassistapp.in', <String, dynamic>{
+//   //   socket = IO.io('wss://api.smartassistapp.in', <String, dynamic>{
 //   //     'transports': ['websocket'],
 //   //     'autoConnect': true,
 //   //   });

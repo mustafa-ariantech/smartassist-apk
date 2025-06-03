@@ -239,7 +239,7 @@ class _TeamsEnquiryidsState extends State<TeamsEnquiryids> {
 
   static Future<Map<String, int>> fetchCallLogs(String mobile) async {
     const String apiUrl =
-        "https://dev.smartassistapp.in/api/leads/call-logs/all";
+        "https://api.smartassistapp.in/api/leads/call-logs/all";
     final token = await Storage.getToken();
 
     try {
@@ -655,7 +655,7 @@ class _TeamsEnquiryidsState extends State<TeamsEnquiryids> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? spId = prefs.getString('user_id');
       final url = Uri.parse(
-        'https://dev.smartassistapp.in/api/leads/mark-lost/${widget.leadId}',
+        'https://api.smartassistapp.in/api/leads/mark-lost/${widget.leadId}',
       );
       final token = await Storage.getToken();
 
@@ -788,7 +788,7 @@ class _TeamsEnquiryidsState extends State<TeamsEnquiryids> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? spId = prefs.getString('user_id');
       final url = Uri.parse(
-        'https://dev.smartassistapp.in/api/leads/convert-to-opp/${widget.leadId}',
+        'https://api.smartassistapp.in/api/leads/convert-to-opp/${widget.leadId}',
       );
       final token = await Storage.getToken();
 

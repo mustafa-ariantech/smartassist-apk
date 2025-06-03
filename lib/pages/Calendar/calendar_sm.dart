@@ -90,20 +90,19 @@ class _CalendarSmState extends State<CalendarSm> {
     }
 
     try {
-       final token = await Storage.getToken();
-      const String apiUrl = "https://dev.smartassistapp.in/api/tasks/all-tasks";
+      final token = await Storage.getToken();
+      const String apiUrl = "https://api.smartassistapp.in/api/tasks/all-tasks";
       final response = await http.get(
         Uri.parse(apiUrl),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-
       );
-       if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         setState(() {
-          // count = data['data']['overdueWeekTasks']?['count'] ?? 0; 
+          // count = data['data']['overdueWeekTasks']?['count'] ?? 0;
           // _originalUpcomingTasks =
           //     data['data']['tasks'] ?? [];
           // _originalOverdueTasks =

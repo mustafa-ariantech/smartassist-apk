@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> fetchProfileData() async {
     final token = await Storage.getToken();
     final response = await http.get(
-      Uri.parse('https://dev.smartassistapp.in/api/users/show-profile'),
+      Uri.parse('https://api.smartassistapp.in/api/users/show-profile'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final token = await Storage.getToken();
     final uri = Uri.parse(
-      'https://dev.smartassistapp.in/api/users/profile/set',
+      'https://api.smartassistapp.in/api/users/profile/set',
     );
 
     final request = http.MultipartRequest('POST', uri)

@@ -554,7 +554,7 @@ class _CreateFollowupsPopupsState extends State<CreateFollowupsPopups> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Plan a Followup',
+                  'Plan a Follow up',
                   style: AppFont.popupTitleBlack(context),
                 ),
                 // TextButton(
@@ -638,7 +638,7 @@ class _CreateFollowupsPopupsState extends State<CreateFollowupsPopups> {
             _buildTextField(
               label: 'Remarks:',
               controller: descriptionController,
-              hint: 'Add remarks',
+              hint: 'Type or speak...',
             ),
             const SizedBox(height: 10),
             Row(
@@ -1468,7 +1468,7 @@ class _CreateFollowupsPopupsState extends State<CreateFollowupsPopups> {
 //             _buildTextField(
 //                 label: 'Comments:',
 //                 controller: descriptionController,
-//                 hint: 'Add Comments'),
+//                 hint: 'Type or speak...'),
 //             const SizedBox(height: 20),
 //             Row(
 //               children: [

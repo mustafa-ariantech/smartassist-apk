@@ -291,7 +291,7 @@ class _CalendarSmState extends State<CalendarSm> {
         backgroundColor: Colors.blue,
         automaticallyImplyLeading: false,
         title: Text(
-          'SM Calendar',
+          'Calendar',
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w500,

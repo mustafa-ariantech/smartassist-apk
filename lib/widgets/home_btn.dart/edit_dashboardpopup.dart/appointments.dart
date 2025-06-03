@@ -585,7 +585,7 @@ class _AppointmentsEditState extends State<AppointmentsEdit> {
                   child: _buildTextField(
                     // label: 'Remark :',
                     controller: descriptionController,
-                    hint: 'Add Comments',
+                    hint: 'Type or speak...',
                   ),
                 ),
               ],

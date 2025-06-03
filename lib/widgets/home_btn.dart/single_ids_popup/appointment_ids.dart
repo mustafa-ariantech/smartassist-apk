@@ -418,7 +418,7 @@ class _AppointmentIdsState extends State<AppointmentIds> {
               _buildTextField(
                 label: 'Comments:',
                 controller: descriptionController,
-                hint: 'Add Comments',
+                hint: 'Type or speak...',
               ),
               const SizedBox(height: 10),
             ],

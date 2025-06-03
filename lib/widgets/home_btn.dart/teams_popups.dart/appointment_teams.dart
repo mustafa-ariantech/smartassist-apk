@@ -573,7 +573,7 @@ class _AppointmentTeamsState extends State<AppointmentTeams> {
               _buildTextField(
                 label: 'Comments:',
                 controller: descriptionController,
-                hint: 'Add Comments',
+                hint: 'Type or speak...',
               ),
               const SizedBox(height: 10),
             ],

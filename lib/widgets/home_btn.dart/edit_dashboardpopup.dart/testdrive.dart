@@ -604,7 +604,7 @@ class _TestdriveState extends State<Testdrive> {
                   child: _buildTextField(
                     // label: 'Remark :',
                     controller: descriptionController,
-                    hint: 'Add Comments',
+                    hint: 'Type or speak...',
                   ),
                 ),
               ],

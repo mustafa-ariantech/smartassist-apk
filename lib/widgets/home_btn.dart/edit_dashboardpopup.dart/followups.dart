@@ -626,7 +626,7 @@ class _FollowupsEditState extends State<FollowupsEdit> {
                   child: _buildTextField(
                     // label: 'Remark :',
                     controller: descriptionController,
-                    hint: 'Add Comments',
+                    hint: 'Type or speak...',
                   ),
                 ),
               ],

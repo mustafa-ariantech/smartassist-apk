@@ -266,7 +266,7 @@ class BottomNavigation extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.people_alt_outlined, size: 28),
               title: Text(
-                'My enquiries',
+                'My Enquiries',
                 style: GoogleFonts.poppins(fontSize: 18),
               ),
               onTap: () => Get.to(() => const AllLeads()),
@@ -274,7 +274,7 @@ class BottomNavigation extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.call_outlined, size: 28),
               title: Text(
-                'My Call Analysis',
+                'My Call Analytics',
                 style: GoogleFonts.poppins(fontSize: 18),
               ),
               onTap: () => Get.to(
@@ -293,7 +293,7 @@ class BottomNavigation extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.star_border_rounded, size: 28),
               title: Text(
-                'Favourite',
+                'Favourites',
                 style: GoogleFonts.poppins(fontSize: 18),
               ),
               onTap: () => Get.to(() => const FavoritePage(leadId: '')),
